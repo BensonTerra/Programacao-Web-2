@@ -1,8 +1,10 @@
+console.log(process.argv)
+
 const {getRandomColor,getAllColors} = require('./EX1.js'); 
-getRandomColor();getAllColors(); 
+getRandomColor();getAllColors();console.log() 
 
-//const {} = require('./EX2.js');
-
+const {calc} = require('./EX2.js');
+calc()
 
 //const {} = require('./EX3.js');
 
