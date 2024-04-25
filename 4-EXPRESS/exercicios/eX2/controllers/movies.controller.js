@@ -73,3 +73,25 @@ function checkLastId() {
   //console.log("checkLastId")
   return ((movies[movies.length-1].id)+1)
 }
+
+exports.findOneWithQuery = (req, res) => {
+  const movieId = req.query.id;
+  // Use o ID do filme para fazer o que for necessário, como buscar informações do filme no banco de dados
+  // e retornar os dados do filme em formato JSON, por exemplo.
+  res.json(movies.filter(movie => movie.id == movieId)[0])
+}
+
+exports.deleteOneWithQuery = (req, res) => {
+  const movieId = req.query.id;
+  //console.log(movieId);
+  if (!checkArray(req)) {
+    //console.log("if ok");
+    movies = movies.filter(movie => 
+    {
+      //console.log(movie.id,parseInt(movieId));
+      return movie.id != parseInt(movieId)
+    });
+    //console.table(movies);
+    res.json(movies);
+  }
+}

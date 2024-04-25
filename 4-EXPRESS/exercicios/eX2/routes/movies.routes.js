@@ -6,7 +6,11 @@ const moviesController = require("../controllers/movies.controller");
 // Rota ('/'))
 router.route('/')
 .get(moviesController.findAll)
-.post(moviesController.bodyValidator, moviesController.create);
+.get(moviesController.findOneWithQuery)
+.post(moviesController.bodyValidator, moviesController.create)
+.delete(moviesController.deleteOneWithQuery)
+
+
 
 // Rota ('/:id')
 router.route('/:id')
