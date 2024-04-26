@@ -74,6 +74,9 @@ function checkLastId() {
   return ((movies[movies.length-1].id)+1)
 }
 
+/*-----------------------------------------------------*/
+/*-------------------Estudo Pessoal--------------------*/
+/*-----------------------------------------------------*/
 exports.findOneWithQuery = (req, res) => {
   const movieId = req.query.id;
   // Use o ID do filme para fazer o que for necessário, como buscar informações do filme no banco de dados
