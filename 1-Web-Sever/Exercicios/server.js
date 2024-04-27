@@ -24,7 +24,7 @@ const server = http.createServer((request, response) => {
     }
     else
     {
-        response.end("<h1>Hello Strange via NODE</h1>"); // send a response back to client, adding thecontent as an argument
+        response.end("<h1>Who are You?</h1>"); // send a response back to client, adding thecontent as an argument
     }
 });
 

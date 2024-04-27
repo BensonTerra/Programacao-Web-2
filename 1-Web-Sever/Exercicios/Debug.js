@@ -1,18 +1,17 @@
-const clear = require('clear'); //clear()
+//const clear = require('clear'); clear()
 
 const http = require('http');
 
-let EX = process.argv.splice(2)
+let EX = process.argv.slice(2)
 const {getRandomColor,getAllColors} = require('./EX1.js');
 const {calc} = require('./EX2.js');
 const {calculoDiferenca} = require('./EX3.js');
 //const {} = require('./EX4.js');
 console.log(EX)
 
-clear()
 if(EX[0] == "EX1")
 {
-  getRandomColor(); getAllColors(); console.log() 
+  getRandomColor(); getAllColors(); //console.log() 
 }
 else if(EX[0] == "EX2")
 {
@@ -21,8 +20,6 @@ else if(EX[0] == "EX2")
 }
 else if(EX[0] == "EX3")
 {
-  //const http = require('http');
-
   const HOST = process.env.HOSTNAME || 'localhost' // local server
   const PORT = process.env.PORT || 3000; // determine the port to listen to by checking the PORT variable first and providing it with a default value, if undefined
 

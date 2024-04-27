@@ -105,7 +105,7 @@ const calculoDiferenca = () =>
   })
   return diferencaDias
 }
-console.table(calculoDiferenca())
+//console.table(calculoDiferenca())
 
 
 module.exports = 
