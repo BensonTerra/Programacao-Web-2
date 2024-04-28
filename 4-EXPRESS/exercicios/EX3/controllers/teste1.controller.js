@@ -23,17 +23,25 @@ exports.bodyValidator = (req, res, next) => {;
 };
 
 exports.create = (req, res) => {
+  checkBodyProducts(req)
+  /*
   console.log(array)
   console.log("Proximo Id: " + checkLastId(array));
   req.body.id = checkLastId(array);
   //res.json(req.body)
   array.push(req.body);
   res.json(products);
+  */
+  res.json("ok")
 }
 
+function checkBodyProducts(req) {
+  console.log("checkBody");
+  return (req.body.name && req.body.price && req.body.stock && req.body.type)
+} 
 
 function checkArrayProducts(req,arrays) {
-  //console.log("checkArray");
+  console.log("checkArray");
   return (arrays.some(array =>
     array.name === req.body.name &&
     array.price === req.body.price &&
