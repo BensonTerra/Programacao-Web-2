@@ -18,7 +18,6 @@ router.use((req, res, next) => {
 router.route('/')
     // GET
     .get(tutorialController.findAll)
-    .get(tutorialController.findOne)
     // POST
     .post(tutorialController.create);
 

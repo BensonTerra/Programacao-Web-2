@@ -20,7 +20,7 @@ exports.findAll = async (req, res) => {
         raw: true,
       }
     )
-    console.log(tutorials)
+    console.table(tutorials)
 
     tutorials.forEach(tutorial => {
       tutorial.links = [
@@ -34,7 +34,10 @@ exports.findAll = async (req, res) => {
       success: true,
       data: tutorials,
       links: [
-        {"rel": "add-tutorial", "href": `/tutorials`, "method": "POST"}
+        {
+          "rel": "add-tutorial", 
+          "href": `/tutorials`, 
+          "method": "POST"}
       ]
     });
   }
@@ -74,8 +77,12 @@ exports.create = async (req, res) => {
 // List just one tutorial
 exports.findOne = async (req, res) => {
   try {
+    
+    console.log("----------------------");
+    console.log("findOne");
+    console.log(req.params.idT)
 
-    let tutorial = await Tutorial.findByPk(req.params.idT, {
+    let tutorial = await Tutorial.findByPk(req.params.id, {
       include: [
         {
           model: db.comment,
