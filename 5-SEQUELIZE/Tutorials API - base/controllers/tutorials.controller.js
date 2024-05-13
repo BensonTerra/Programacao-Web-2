@@ -1,10 +1,10 @@
 const { raw } = require("mysql2");
-const db = require("../models/index.js");
+const db = require("/models/index.js");
 const Tutorial = db.tutorial;
 
 //"Op" necessary for LIKE operator
 const { Op, ValidationError, where } = require('sequelize');
-const { link } = require("../routes/tutorials.routes.js");
+const { link } = require("/routes/tutorials.routes.js");
 const { model } = require("mongoose");
 
 
