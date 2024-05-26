@@ -42,13 +42,8 @@ exports.findAll = async (req, res) => {
     try {
         let data = await Tutorial
             .find(condition) //condition: 
-<<<<<<< HEAD
             //.select('title description published ') // select the fields (it will add _id)
             //.select('-__v -comments ')
-=======
-            .select('title description published ') // select the fields (it will add _id)
-            .select('-__v, comments ')
->>>>>>> 7a5507b49b53118e8dc84d3aed2045517d1dc284
             .exec();
         return res.status(200).json({ success: true, tutorials: data });
     }
