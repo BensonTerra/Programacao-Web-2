@@ -39,8 +39,15 @@ exports.create = async (req, res) => {
 
 // Delete a Comment with the specified id in the request
 exports.delete = async (req, res) => {
+    console.log("Comments---Delete");
     try {
-        // TODO
+        
+        const tutorial = await Tutorial.findById(req.params.idT); console.log(tutorial)
+        if(!tutorial) {
+            
+        }
+
+
         return res.status(200).json({
             success: true, msg: `Comment id=${req.params.idC} was deleted successfully.`
         });
