@@ -4,11 +4,7 @@ const Tutorial = db.tutorials;
 
 exports.findAll = async (req, res) => {
     try {
-        let data = await Comment
-            .findAll()
-            .exec()
 
-        res.status(201).json({ success: true, msg: data, URL: "/tutorials/" + req.params.idT + "/comments/" + data._id });
     }
     catch (err) {
         if (err.name === "CastError") {

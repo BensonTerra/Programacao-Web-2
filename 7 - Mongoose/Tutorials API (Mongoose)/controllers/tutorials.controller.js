@@ -10,7 +10,7 @@ exports.findAll = async (req, res) => {
     try {
         let data = await Tutorial
             .find(condition) //condition: 
-            //.select('title description published ') // select the fields (it will add _id)
+            .select('title description published ') // select the fields (it will add _id)
             //.select('-__v -comments ')
             .exec();
         return res.status(200).json({ success: true, tutorials: data });
