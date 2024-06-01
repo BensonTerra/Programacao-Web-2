@@ -2,38 +2,6 @@ const db = require("../models/index.js");
 const Tutorial = db.tutorials;
 const Comment = db.comments;
 
-// Create and Save a new Tutorial
-exports.create = async (req, res) => {
-    // Save Tutorial in the database
-    const tutorial = new Tutorial({
-        title: req.body.title,
-        description: req.body.description,
-        published: req.body.published
-    });
-
-    try {
-        let newTutorial = await tutorial.save();
-        res.status(201).json({
-            success: true,
-            msg: "New tutorial created.", URL: "/tutorials/" + newTutorial._id
-        });
-    }
-    catch (err) {
-        console.log(err instanceof SyntaxError)
-        if (err.name === "ValidationError") {
-            let errors = {};
-            Object.keys(err.errors).forEach((key) => {
-                errors[key] = err.errors[key].message;
-            });
-            return res.status(400).json({ success: false, msg: errors });
-        }
-        return res.status(500).json({
-            success: false, msg: err.message || "Some error occurred while creating the tutorial."
-        });
-    }
-
-};
-
 // Retrieve all Tutorials / find by title
 exports.findAll = async (req, res) => {
     const title = req.query.title;
@@ -78,6 +46,37 @@ exports.findOne = async (req, res) => {
         }
         return res.status(500).json({
             success: false, msg: `Error retrieving tutorial with ID ${req.params.idT}.`
+        });
+    }
+};
+
+// Create and Save a new Tutorial
+exports.create = async (req, res) => {
+    // Save Tutorial in the database
+    const tutorial = new Tutorial({
+        title: req.body.title,
+        description: req.body.description,
+        published: req.body.published
+    });
+
+    try {
+        let newTutorial = await tutorial.save();
+        res.status(201).json({
+            success: true,
+            msg: "New tutorial created.", URL: "/tutorials/" + newTutorial._id
+        });
+    }
+    catch (err) {
+        console.log(err instanceof SyntaxError)
+        if (err.name === "ValidationError") {
+            let errors = {};
+            Object.keys(err.errors).forEach((key) => {
+                errors[key] = err.errors[key].message;
+            });
+            return res.status(400).json({ success: false, msg: errors });
+        }
+        return res.status(500).json({
+            success: false, msg: err.message || "Some error occurred while creating the tutorial."
         });
     }
 };
