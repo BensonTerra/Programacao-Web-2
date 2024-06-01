@@ -2,6 +2,26 @@ const db = require("../models/index.js");
 const Comment = db.comments;
 const Tutorial = db.tutorials;
 
+exports.findAll = async (req, res) => {
+    try {
+        let data = await Comment
+            .findAll()
+            .exec()
+
+        res.status(201).json({ success: true, msg: data, URL: "/tutorials/" + req.params.idT + "/comments/" + data._id });
+    }
+    catch (err) {
+        if (err.name === "CastError") {
+            return res.status(400).json({
+                success: false, msg: ""
+            });
+        }
+        res.status(500).json({
+            success: false, msg: `Some error occurred while creating the Comment.`
+        });
+    }
+};
+
 // Create and Save a new Comment
 exports.create = async (req, res) => {
     try {
