@@ -2,6 +2,24 @@ const db = require("../models/index.js");
 const Comment = db.comments;
 const Tutorial = db.tutorials;
 
+exports.findAll = async (req, res) => {
+    console.log("Comments---findAll")
+
+    try {
+        let data = await Tutorial
+            .find()
+            .select('comments ') // select the fields (it will add _id)
+            .exec();
+        return res.status(200).json({ success: true, tutorials: data });
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false, msg: err.message || "Some error occurred while retrieving the tutorials."
+        });
+    }
+};
+
+
 // Create and Save a new Comment
 exports.create = async (req, res) => {
     try {
