@@ -26,10 +26,12 @@ app.get('/', function (req, res) {
 // routing middleware (mounted on /tutorials route)
 app.use('/tutorials', require('./routes/tutorials.routes.js'))
 
+
+//--//--//
+
 // handle invalid routes
 app.all('*', function (req, res) {
     res.status(404).json({ message: 'WHAT???' });
 })
-
 
 app.listen(port, host, () => console.log(`App listening at http://${host}:${port}/`));
