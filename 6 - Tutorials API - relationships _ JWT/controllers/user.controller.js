@@ -75,7 +75,7 @@ exports.login = async (req, res, next) => {
 
 exports.getAllUsers = async (req, res, next) => {
     try {
-        let users = await User.findAll({ attributes: ['id', 'username', 'email', 'role'] })
+        let users = await User.findAll({ attributes: ['id', 'username', 'password' , 'email', 'role'] })
         res.status(200).json({ success: true, data: users });
     }
     catch (err) {

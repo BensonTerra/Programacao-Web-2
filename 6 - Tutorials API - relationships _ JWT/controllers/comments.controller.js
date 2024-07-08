@@ -11,17 +11,22 @@ const { ValidationError } = require('sequelize');
 exports.findTutorial = async (req, res, next) => {
     try {
         // try to find the tutorial, given its ID
-        req.tutorial = await Tutorial.findByPk(req.params.idT)
+        req.tutorial = await Tutorial.findByPk(req.params.idT); //console.log(req.tutorial);
+
         if (req.tutorial === null)
             throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
         else
             next();
+        return res.status(200).json({
+            success: true,
+            data: req.tutorial
+
+        });
     }
     catch (err) {
         next(err)
     }
 }
-
 
 exports.isAuthor = async (req, res, next) => {
     try {
@@ -78,6 +83,7 @@ exports.findAll = async (req, res, next) => {
 // POST /tutorials/:idT/comments 
 //  BODY: text(mandatory)
 exports.create = async (req, res, next) => {
+    console.clear()
     try {
         // save Comment in the database
         let newComment = await Comment.create({
@@ -85,19 +91,24 @@ exports.create = async (req, res, next) => {
             TutorialId: req.params.idT,
             author: req.loggedUserId
         });
+        console.log(newComment);
 
         res.status(201).json({
             success: true,
             msg: `Comment added to tutorial with ID ${req.params.idT}.`,
             URL: `/tutorials/${req.params.idT}/comments/${newComment.id}`
         });
+
+        // Adiciona return para garantir que o bloco catch não seja executado
+        return;
     }
     catch (err) {
         if (err instanceof ValidationError)
             err = new ErrorHandler(400, err.errors.map(e => e.message));
-        next(err)
+
     };
 };
+
 
 
 exports.update = async (req, res, next) => {

@@ -7,6 +7,7 @@ let router = express.Router();
 
 
 router.route('/')
+    //authController.verifyToken, authController.isAdmin, 
     .get(authController.verifyToken, authController.isAdmin, userController.getAllUsers) //ADMIN ACCESS ONLY
     .post(userController.create);   //PUBLIC
 

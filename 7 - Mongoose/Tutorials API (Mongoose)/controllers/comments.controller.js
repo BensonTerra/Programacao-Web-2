@@ -3,6 +3,7 @@ const Comment = db.comments;
 const Tutorial = db.tutorials;
 
 exports.findAll = async (req, res) => {
+    console.clear()
     console.log("Comments---findAll")
 
     try {
