@@ -56,16 +56,16 @@ db.tag.belongsToMany(db.tutorial, {
 db.comment.belongsTo(db.user, {foreignKey: "author"});
 db.user.hasMany(db.comment, {foreignKey: "author"});
 
-// // optionally: SYNC
-// (async () => {
-//     try {
-//         // await sequelize.sync({ force: true });
-//         //await sequelize.sync({ alter: true });
-//         // await sequelize.sync();
-//         console.log('DB is successfully synchronized')
-//     } catch (error) {
-//         console.log(error)
-//     }
-// })();
+// optionally: SYNC
+(async () => {
+    try {
+        // await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
+        // await sequelize.sync();
+        console.log('DB is successfully synchronized')
+    } catch (error) {
+        console.log(error)
+    }
+})();
 
 module.exports = db;

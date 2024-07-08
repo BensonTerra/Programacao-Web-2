@@ -10,6 +10,7 @@ const { Op, ValidationError } = require('sequelize');
 // Display list of all tutorials (with pagination)
 exports.findAll = async (req, res, next) => {
     //get data from request query string (if not existing, they will be undefined)
+    console.log(req.query)
     let { page, size, title } = req.query;
 
     // validate page
@@ -30,6 +31,7 @@ exports.findAll = async (req, res, next) => {
 
     // search by title require to build a query with the operator L
     const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+
 
     try {
         let tutorials = await Tutorial.findAndCountAll({
