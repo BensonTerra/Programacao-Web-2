@@ -6,6 +6,7 @@ const Tag = db.tag;
 
 //necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
+const clear = require('clear');
 
 // Display list of all tutorials (with pagination)
 exports.findAll = async (req, res, next) => {
@@ -90,6 +91,7 @@ exports.create = async (req, res, next) => {
 // List just one tutorial
 exports.findOne = async (req, res, next) => {
     try {
+        clear()
         // obtains only a single entry from the table, using the provided primary key
         let tutorial = await Tutorial.findByPk(req.params.idT, {
             include: [{ // EAGER LOADING
@@ -100,7 +102,7 @@ exports.findOne = async (req, res, next) => {
                 model: db.tag,
                 through: { attributes: [] } // exclude data from junction table
             }]
-        })
+        }); //console.log(tutorial)
         // if tutorial was not found
         if (tutorial === null)
             // return next(CreateError(404, `Cannot find any tutorial with ID ${req.params.idT}.`));

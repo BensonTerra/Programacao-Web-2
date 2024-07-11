@@ -1,5 +1,6 @@
 const { dbConfig } = require('../utils/config.js');
 const { Sequelize, DataTypes } = require('sequelize');
+const clear = require('clear')
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
@@ -62,6 +63,7 @@ db.user.hasMany(db.comment, {foreignKey: "author"});
         // await sequelize.sync({ force: true });
         await sequelize.sync({ alter: true });
         // await sequelize.sync();
+        clear()
         console.log('DB is successfully synchronized')
     } catch (error) {
         console.log(error)
