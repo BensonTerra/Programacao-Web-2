@@ -20,10 +20,10 @@ app.use((req, res, next) => {
 
 // Rota raiz -- /api/
 app.get('/', function (req, res) {
-  res.status(200).json({ message: 'home -- MOVIES api' });
+  res.status(200).json({ message: 'home -- vending machine api' });
 });
 
-// Middleware de roteamento para o recurso MOVIES
+// Middleware de roteamento para o recurso MOVIE
 app.use('/teste1', require('./routes/teste1.routes.js'));
 
 // Tratamento de rotas inválidas

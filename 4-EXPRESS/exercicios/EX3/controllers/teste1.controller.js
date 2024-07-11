@@ -24,15 +24,15 @@ exports.bodyValidator = (req, res, next) => {;
 
 exports.create = (req, res) => {
   checkBodyProducts(req)
-  /*
-  console.log(array)
-  console.log("Proximo Id: " + checkLastId(array));
+  
+  //console.log(array)
+  //console.log("Proximo Id: " + checkLastId(array));
   req.body.id = checkLastId(array);
   //res.json(req.body)
   array.push(req.body);
   res.json(products);
-  */
-  res.json("ok")
+  
+  //res.json("ok")
 }
 
 function checkBodyProducts(req) {
