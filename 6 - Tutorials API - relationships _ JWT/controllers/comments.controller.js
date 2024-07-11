@@ -6,27 +6,24 @@ const Comment = db.comment;
 
 // necessary for LIKE operator
 const { ValidationError } = require('sequelize');
+const clear = require('clear')
 
 
 exports.findTutorial = async (req, res, next) => {
     try {
-        // try to find the tutorial, given its ID
-        req.tutorial = await Tutorial.findByPk(req.params.idT); //console.log(req.tutorial);
-
-        if (req.tutorial === null)
-            throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
-        else
-            next();
-        return res.status(200).json({
-            success: true,
-            data: req.tutorial
-
+        let tutorial = await Tutorial.findByPk(req.params.idT, {
+            include: [{ model: db.comment, attributes: ['id', 'text'] }]
         });
+
+        if (!tutorial) throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
+
+        req.tutorial = tutorial;
+        next();
+    } catch (err) {
+        next(err);
     }
-    catch (err) {
-        next(err)
-    }
-}
+};
+
 
 exports.isAuthor = async (req, res, next) => {
     try {
@@ -51,33 +48,58 @@ exports.isAuthor = async (req, res, next) => {
 
 // Display list of all comments for a given tutorial
 // GET /tutorials/:idT/comments 
-exports.findAll = async (req, res, next) => {
+exports.findAllComments = async (req, res, next) => {
     try {
         let comments = await req.tutorial.getComments({
             attributes: ['id', 'text', 'author'],
             raw: true
         });
 
-        // map HATEOAS links to each one of the tutorials
         comments.forEach(comment => {
             comment.links = [
-                { rel: "delete", href: `/tutorials/${req.params.idT}/comments/${comment.id}`, method: "DELETE" },
                 { rel: "modify", href: `/tutorials/${req.params.idT}/comments/${comment.id}`, method: "PATCH" },
-            ]
+                { rel: "delete", href: `/tutorials/${req.params.idT}/comments/${comment.id}`, method: "DELETE" },
+            ];
         });
-        req.tutorial.dataValues.comments = comments
+
         res.status(200).json({
             success: true,
-            data: req.tutorial,
-            links: [
-                { rel: "add-comment", href: `/tutorials/${req.params.idT}/comments`, method: "POST" }
-            ]
+            tutorial: req.params.idT,
+            data: comments,
         });
-    }
-    catch (err) {
-        next(err)
+    } catch (err) {
+        next(err);
     }
 };
+
+exports.findOneComment = async (req, res, next) => {
+    try {
+        clear();
+        let comments = await req.tutorial.getComments({
+            attributes: ['id', 'text', 'author'],
+            raw: true
+        });
+
+        let comment = comments.find(comment => comment.id == req.params.idC);
+
+        if (comment) {
+            comment.links = [
+                { rel: "modify", href: `/tutorials/${req.params.idT}/comments/${req.params.idC}`, method: "PATCH" },
+                { rel: "delete", href: `/tutorials/${req.params.idT}/comments/${req.params.idC}`, method: "DELETE" },
+            ];
+        }
+
+        res.status(200).json({
+            success: true,
+            tutorial_id: req.params.idT,
+            comment_id: req.params.idC,
+            data: comment,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 // Handle comment creation: 
 // POST /tutorials/:idT/comments 
@@ -108,8 +130,6 @@ exports.create = async (req, res, next) => {
 
     };
 };
-
-
 
 exports.update = async (req, res, next) => {
     try {

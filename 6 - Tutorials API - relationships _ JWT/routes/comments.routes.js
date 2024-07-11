@@ -9,10 +9,11 @@ let router = express.Router({ mergeParams: true });
 router.use(commentController.findTutorial)
 
 router.route('/')
-    .get(commentController.findAll) // GET /tutorials/:idT/comments
+    .get(commentController.findAllComments) // GET /tutorials/:idT/comments
     .post(authController.verifyToken, commentController.create);//POST /tutorials/:idT/comments
 
 router.route('/:idC')
+    .get(commentController.findOneComment) // GET /tutorials/:idT/comments/:idC
     .patch(authController.verifyToken, commentController.isAuthor, commentController.update) // PATCH /tutorials/:idT/comments/:idC
     .delete(authController.verifyToken, commentController.isAuthor, commentController.delete);// DELETE /tutorials/:idT/comments/:idC
 
