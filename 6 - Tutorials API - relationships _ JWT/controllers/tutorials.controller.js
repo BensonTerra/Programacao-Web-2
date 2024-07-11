@@ -65,29 +65,6 @@ exports.findAll = async (req, res, next) => {
     }
 };
 
-// Handle tutorial create on POST
-exports.create = async (req, res, next) => {
-    try {
-        // Save Tutorial in the database
-        let newTutorial = await Tutorial.create(req.body);
-        res.status(201).json({
-            success: true, 
-            msg: "Tutorial successfully created.",
-            links: [
-                { "rel": "self", "href": `/tutorials/${newTutorial.id}`, "method": "GET" },
-                { "rel": "delete", "href": `/tutorials/${newTutorial.id}`, "method": "DELETE" },
-                { "rel": "modify", "href": `/tutorials/${newTutorial.id}`, "method": "PUT" },
-            ]
-        });
-    }
-    catch (err) {
-        // console.log(err.name) // err.name === 'SequelizeValidationError'
-        if (err instanceof ValidationError)
-            err = new ErrorHandler(400, err.errors.map(e => e.message));
-        next(err)
-    };
-};
-
 // List just one tutorial
 exports.findOne = async (req, res, next) => {
     try {
@@ -118,6 +95,29 @@ exports.findOne = async (req, res, next) => {
             ] });
     }
     catch (err) {
+        next(err)
+    };
+};
+
+// Handle tutorial create on POST
+exports.create = async (req, res, next) => {
+    try {
+        // Save Tutorial in the database
+        let newTutorial = await Tutorial.create(req.body);
+        res.status(201).json({
+            success: true, 
+            msg: "Tutorial successfully created.",
+            links: [
+                { "rel": "self", "href": `/tutorials/${newTutorial.id}`, "method": "GET" },
+                { "rel": "modify", "href": `/tutorials/${newTutorial.id}`, "method": "PUT" },
+                { "rel": "delete", "href": `/tutorials/${newTutorial.id}`, "method": "DELETE" },
+            ]
+        });
+    }
+    catch (err) {
+        // console.log(err.name) // err.name === 'SequelizeValidationError'
+        if (err instanceof ValidationError)
+            err = new ErrorHandler(400, err.errors.map(e => e.message));
         next(err)
     };
 };
@@ -166,6 +166,8 @@ exports.delete = async (req, res, next) => {
         next(err)
     };
 };
+
+/*----------------------------------------------------------------*/
 
 // Add tag to tutorial
 exports.addTag = async (req, res, next) => {
