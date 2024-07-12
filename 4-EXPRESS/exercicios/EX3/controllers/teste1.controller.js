@@ -5,10 +5,6 @@ let purchases = arrays.purchases;//console.log(purchases)
 let array
 // exports custom request payload validation middleware
 
-exports.findAllProducts = (req, res) => {
-  res.json(products);
-};
-
 exports.bodyValidator = (req, res, next) => {;
   if(req.url=='/products'){
     console.log("check")
@@ -22,6 +18,26 @@ exports.bodyValidator = (req, res, next) => {;
   }
 };
 
+exports.findAllProducts = (req, res) => {
+  res.json(products);
+};
+
+exports.findOneProduct = async (req, res) => {
+  // obtains only a single entry from the table, using the provided primary key
+  let product = products.find( product => product.id == req.params.idP); console.log(product);
+
+  // if tutorial was not found
+  if (product === null)
+    // return next(CreateError(404, `Cannot find any tutorial with ID ${req.params.idT}.`));
+    throw new ErrorHandler(404, `Cannot find any product with ID ${req.params.idP}.`);
+
+  // answer with a success status if tutorial was found
+  return res.json({ 
+    success: true, 
+    data: product
+    });
+  }
+
 exports.create = (req, res) => {
   checkBodyProducts(req)
   
@@ -34,6 +50,12 @@ exports.create = (req, res) => {
   
   //res.json("ok")
 }
+
+
+
+exports.findAllPurchases = (req, res) => {
+  res.json(purchases);
+};
 
 function checkBodyProducts(req) {
   console.log("checkBody");

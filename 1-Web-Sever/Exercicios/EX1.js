@@ -13,7 +13,7 @@ const allColors =
 function getRandomColor() 
 {
   let color = allColors[Math.floor(Math.random()*allColors.length)]; //console.log(color);
-  //console.log('getRandomColor | ' + "Color: " + color.name + ' | Hex:' + color.code)
+  console.log('getRandomColor | ' + "Color: " + color.name + ' | Hex:' + color.code)
 }
 
 const getAllColors = () => 

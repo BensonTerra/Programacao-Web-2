@@ -11,7 +11,9 @@ console.log(EX)
 
 if(EX[0] == "EX1")
 {
-  getRandomColor(); getAllColors(); //console.log() 
+  getRandomColor(); 
+  getAllColors(); 
+  console.log() 
 }
 else if(EX[0] == "EX2")
 {
