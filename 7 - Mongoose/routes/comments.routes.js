@@ -9,7 +9,6 @@ router.route('/')
     .post( commentController.create); //POST /tutorials/:idT/comments
     
 router.route('/:idC')
-    .get( commentController.findOne)
     .delete( commentController.delete); // DELETE /tutorials/:idT/comments/:idC
 
 router.all('*', function (req, res) {
