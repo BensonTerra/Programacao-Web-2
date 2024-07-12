@@ -3,23 +3,26 @@ const Comment = db.comments;
 const Tutorial = db.tutorials;
 
 exports.findAll = async (req, res) => {
-    console.clear()
-    console.log("Comments---findAll")
+    console.clear();
+    console.log("Comments---findAll");
 
     try {
+        // Substitua 'Tutorial' pelo nome correto do seu modelo
         let data = await Tutorial
-            .find()
-            .select('comments ') // select the fields (it will add _id)
+            .find({ _id: req.params.idT }) // Corrigido: Usar apenas uma chave para o objeto de filtro
+            .select('comments') // Selecionar apenas o campo 'comments' (isso incluirá também o campo _id por padrão)
             .exec();
+
+        // Retornar a resposta de sucesso com os dados encontrados
         return res.status(200).json({ success: true, tutorials: data });
-    }
-    catch (err) {
+    } catch (err) {
+        // Retornar uma resposta de erro em caso de exceção
         return res.status(500).json({
-            success: false, msg: err.message || "Some error occurred while retrieving the tutorials."
+            success: false,
+            msg: err.message || "Some error occurred while retrieving the tutorials."
         });
     }
 };
-
 
 // Create and Save a new Comment
 exports.create = async (req, res) => {
