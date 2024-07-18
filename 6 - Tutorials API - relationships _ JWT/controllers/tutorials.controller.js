@@ -150,7 +150,7 @@ exports.update = async (req, res, next) => {
     };
 };
 
-// Update one tutorial
+// Delete one tutorial
 exports.delete = async (req, res, next) => {
     try {
         let result = await Tutorial.destroy({ where: { id: req.params.idT } })
