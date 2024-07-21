@@ -1,0 +1,8 @@
+[{"_id":{"$oid":"62c61ba5498da7e2e201b3a9"},"name":"Lettuce","type":"base","price":{"$numberDouble":"0.2"},"savings":{"$numberInt":"4"}},
+{"_id":{"$oid":"62c61ba5498da7e2e201b3b0"},"name":"Arugula","type":"base","price":{"$numberDouble":"0.25"},"savings":{"$numberInt":"0"}},
+{"_id":{"$oid":"62c61c0d498da7e2e201b3b1"},"name":"Tomato","type":"topping","price":{"$numberDouble":"0.15"},"savings":{"$numberInt":"2"}},
+{"_id":{"$oid":"62c61c0d498da7e2e201b3b2"},"name":"Tuna","type":"topping","price":{"$numberDouble":"0.3"},"savings":{"$numberInt":"0"}},
+{"_id":{"$oid":"62c61c0d498da7e2e201b3b3"},"name":"Vinaigrette","type":"dressing","price":{"$numberDouble":"0.3"},"savings":{"$numberInt":"2"}},
+{"_id":{"$oid":"62c61c0d498da7e2e201b3b4"},"name":"Bearnaise","type":"dressing","price":{"$numberDouble":"0.3"},"savings":{"$numberInt":"0"}}]
+
+

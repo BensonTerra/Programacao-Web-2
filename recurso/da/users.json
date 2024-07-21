@@ -1,0 +1,8 @@
+[{"_id":{"$oid":"62968848374245521f560f98"},"username":"admin","password":"12345","isAdmin":true,"__v":0,"rentals":[]},
+{"_id":{"$oid":"62968936374245521f560f99"},"username":"regular",
+"password":"12345","isAdmin":false,"__v":0,
+"rentals":[{
+    "instance": {"$oid":"6296861fae4ebe3304904efc"},
+    "requestedAt":{"$date":{"$numberLong":"1721174400000"}},
+    "deliveredAt":null
+}]}]

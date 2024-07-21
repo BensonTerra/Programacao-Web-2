@@ -55,14 +55,14 @@ exports.findOne = async (req, res) => {
 
 // Create and Save a new Tutorial
 exports.create = async (req, res) => {
-    // Save Tutorial in the database
-    const tutorial = new Tutorial({
-        title: req.body.title,
-        description: req.body.description,
-        published: req.body.published
-    });
-
     try {
+        // Save Tutorial in the database
+        const tutorial = new Tutorial({
+            title: req.body.title,
+            description: req.body.description,
+            published: req.body.published
+        });
+
         let newTutorial = await tutorial.save();
         res.status(201).json({
             success: true,

@@ -1,17 +1,18 @@
 const db = require("../models/index.js");
 const { ErrorHandler } = require("../utils/error.js");
 
-const Tutorial = db.tutorial;
-const Tag = db.tag;
+const Book = db.books;
 
 //necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
 const clear = require('clear');
 
-// Display list of all tutorials (with pagination)
+
+
+
+// Display list of all books (with pagination)
 exports.findAll = async (req, res, next) => {
     //get data from request query string (if not existing, they will be undefined)
-    console.log(req.query)
     let { page, size, title } = req.query;
 
     // validate page
@@ -27,7 +28,7 @@ exports.findAll = async (req, res, next) => {
     // Sequelize function findAndCountAll parameters: 
     //      limit -> number of rows to be retrieved
     //      offset -> number of rows to be offseted (not retrieved)
-    const limit = size ? size : 3;          // limit = size (default is 3)
+    const limit = size ? size : 5;          // limit = size (default is 1)
     const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
     // search by title require to build a query with the operator L
@@ -35,29 +36,21 @@ exports.findAll = async (req, res, next) => {
 
 
     try {
-        let tutorials = await Tutorial.findAndCountAll({
+        let books = await Book.findAndCountAll({
             where: condition,
             limit, offset,
             raw: true
         })
 
-        // map HATEOAS links to each one of the tutorials
-        tutorials.rows.forEach(tut => {
-            tut.links = [
-                { rel: "self", href: `/tutorials/${tut.id}`, method: "GET" },
-                { rel: "delete", href: `/tutorials/${tut.id}`, method: "DELETE" },
-                { rel: "modify", href: `/tutorials/${tut.id}`, method: "PUT" },
-            ]
+        // map HATEOAS links to each one of the books
+        books.rows.forEach(book => {
+            //
         });
 
         // map default response to desired response data structure
         return res.status(200).json({
             success: true,
-            data: tutorials.rows,
-            links: [
-                { rel: "create-tutorial", href: `/tutorials`, method: "POST" }
-            ]
-
+            data: books.rows,
         });
     }
     catch (err) {
@@ -68,33 +61,32 @@ exports.findAll = async (req, res, next) => {
 // List just one tutorial
 exports.findOne = async (req, res, next) => {
     try {
-        clear()
+        clear();
         // obtains only a single entry from the table, using the provided primary key
-        let tutorial = await Tutorial.findByPk(req.params.idT, {
+        let book = await Book.findByPk(req.params.id, {
             include: [
-                { // EAGER LOADING
-                    model: db.comment,
-                    attributes: ['id', 'text'] // exclude FK tutorialId
+                {   // EAGER LOADING
+                    model: db.bookGenres,
+                    attributes: ['id', 'genre'] // exclude FK tutorialId
                 },
                 {
-                    model: db.tag,
-                    attributes:['name'],
+                    model: db.genres,
                     through: { attributes: [] } // exclude data from junction table
                 }
             ]
-        }); //console.log(tutorial)
+        }); //console.log(book)
         // if tutorial was not found
-        if (tutorial === null)
+        if (book === null)
             // return next(CreateError(404, `Cannot find any tutorial with ID ${req.params.idT}.`));
-            throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
+            throw new ErrorHandler(404, `Cannot find any book with ID ${req.params.id}.`);
 
         // answer with a success status if tutorial was found
         return res.json({ 
             success: true, 
-            data: tutorial,
+            data: book,
             links: [
-                { "rel": "delete", "href": `/tutorials/${tutorial.id}`, "method": "DELETE" },
-                { "rel": "modify", "href": `/tutorials/${tutorial.id}`, "method": "PUT" },
+                { "rel": "delete", "href": `/books/${book.id}`, "method": "DELETE" },
+                { "rel": "modify", "href": `/books/${book.id}`, "method": "PUT" },
             ] });
     }
     catch (err) {
@@ -106,15 +98,10 @@ exports.findOne = async (req, res, next) => {
 exports.create = async (req, res, next) => {
     try {
         // Save Tutorial in the database
-        let newTutorial = await Tutorial.create(req.body);
+        let newBook = await Book.create(req.body);
         res.status(201).json({
             success: true, 
-            msg: "Tutorial successfully created.",
-            links: [
-                { "rel": "self", "href": `/tutorials/${newTutorial.id}`, "method": "GET" },
-                { "rel": "modify", "href": `/tutorials/${newTutorial.id}`, "method": "PUT" },
-                { "rel": "delete", "href": `/tutorials/${newTutorial.id}`, "method": "DELETE" },
-            ]
+            msg: "Book successfully created.",
         });
     }
     catch (err) {
@@ -129,12 +116,12 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     try {
         // since Sequelize update() does not distinguish if a tutorial exists, first let's try to find one
-        let tutorial = await Tutorial.findByPk(req.params.idT);
+        let tutorial = await Book.findByPk(req.params.idT);
         if (tutorial === null)
             throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
 
         // obtains only a single entry from the table, using the provided primary key
-        let affectedRows = await Tutorial.update(req.body, { where: { id: req.params.idT } })
+        let affectedRows = await Book.update(req.body, { where: { id: req.params.idT } })
 
         if (affectedRows[0] === 0) // check if the tutorial was updated (returns [0] if no data was updated)
             return res.status(200).json({
@@ -156,7 +143,7 @@ exports.update = async (req, res, next) => {
 // Delete one tutorial
 exports.delete = async (req, res, next) => {
     try {
-        let result = await Tutorial.destroy({ where: { id: req.params.idT } })
+        let result = await Book.destroy({ where: { id: req.params.idT } })
         if (result == 1) // the promise returns the number of deleted rows
             res.status(200).json({
                 success: true, msg: `Tutorial with id ${req.params.idT} was successfully deleted!`
@@ -164,63 +151,6 @@ exports.delete = async (req, res, next) => {
         // no rows deleted -> no tutorial was found
         else
             throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
-    }
-    catch (err) {
-        next(err)
-    };
-};
-
-/*----------------------------------------------------------------*/
-
-// Add tag to tutorial
-exports.addTag = async (req, res, next) => {
-    try {
-        // try to find the tutorial, given its ID
-        let tutorial = await Tutorial.findByPk(req.params.idT)
-        if (tutorial === null)
-            throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
-
-        // try to find the tag, given its ID
-        let tag = await Tag.findByPk(req.params.idTag)
-        if (tag === null)
-            throw new ErrorHandler(404, `Cannot find any tag with name ${req.params.idTag}.`);
-
-        // MIXIN
-        let result = await tutorial.addTag(tag);
-        if (result == undefined)
-            throw new ErrorHandler(409, `Tutorial ${req.params.idT} already has tag ${req.params.idTag}.`)
-
-        return res.status(200).json({
-            success: true, msg: `Tag ${req.params.idTag} was added to tutorial with id ${req.params.idT}!`
-        });
-
-    }
-    catch (err) {
-        next(err)
-    };
-};
-
-// Remove tag from tutorial
-exports.deleteTag = async (req, res, next) => {
-    try {
-        // try to find the tutorial, given its ID
-        let tutorial = await Tutorial.findByPk(req.params.idT)
-        if (tutorial === null)
-            throw new ErrorHandler(404, `Cannot find any tutorial with ID ${req.params.idT}.`);
-
-        // try to find the tag, given its ID
-        let tag = await Tag.findByPk(req.params.idTag)
-        if (tag === null)
-            throw new ErrorHandler(404, `Cannot find any tag with name ${req.params.idTag}.`);
-
-        let result = await tutorial.removeTag(tag);
-        if (result == 0)
-            throw new ErrorHandler(404, `Tutorial id ${req.params.idT} does not have tag ${req.params.idTag}.`);
-
-        return res.status(200).json({
-            success: true, msg: `Tag ${req.params.idTag} was removed from tutorial with id ${req.params.idT}!`
-        });
-
     }
     catch (err) {
         next(err)
