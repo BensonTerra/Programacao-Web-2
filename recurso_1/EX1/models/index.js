@@ -26,11 +26,14 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.sequelize = sequelize;
 
+/*----------------------------------------------------------------*/
+/*
 db.books = require("./book.model.js")(sequelize, DataTypes);
 db.bookGenres  = require("./bookGenre.model.js")(sequelize, DataTypes);
 db.genres = require("./genre.model.js")(sequelize, DataTypes)
+*/
 /*----------------------------------------------------------------*/
-
+/*
 db.books.hasMany(db.genres, { onDelete: 'CASCADE' });
 db.genres.belongsTo(db.books);
 
@@ -40,7 +43,7 @@ db.books.belongsToMany(db.genres, {
 db.genres.belongsToMany(db.books, {
     through: 'booksGenres', timestamps: false
 });
-
+*/
 /*----------------------------------------------------------------*/
 // optionally: SYNC
 (async () => {
