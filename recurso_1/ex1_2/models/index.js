@@ -28,14 +28,15 @@ db.sequelize = sequelize;
 
 //export TUTORIAL model
 db.tutorial = require("./tutorials.model.js")(sequelize, DataTypes);
-
 //export COMMENT model
 db.comment = require("./comments.model.js")(sequelize, DataTypes);
 //export TAG model
 db.tag = require("./tags.model.js")(sequelize, DataTypes);
-
 //export USER model
 db.user = require("./users.model.js")(sequelize, DataTypes);
+
+// recurso
+db.book = require("./recursoModels/books.model.js")(sequelize, DataTypes);
 
 
 //define the relationships
@@ -62,7 +63,7 @@ db.user.hasMany(db.comment, {foreignKey: "author"});
     try {
         // await sequelize.sync({ force: true });
         await sequelize.sync({ alter: true });
-        // await sequelize.sync();
+        //  await sequelize.sync();
         clear()
         console.log('DB is successfully synchronized')
     } catch (error) {
