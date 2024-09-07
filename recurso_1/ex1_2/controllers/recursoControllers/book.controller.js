@@ -8,7 +8,7 @@ const clear = require('clear');
 
 exports.findAll = async (req, res, next) => {
     //res.status(400).json({ success: true, message:Book})
-    clear();console.log(Book)
+    clear();//console.log(Book)
 
     
     //get data from request query string (if not existing, they will be undefined)

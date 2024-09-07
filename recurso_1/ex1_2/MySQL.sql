@@ -1,3 +1,16 @@
+use recurso_Ex;
+
+-- Dropar as Foreign Keys
+ALTER TABLE `booksGenresRecurso` DROP FOREIGN KEY `booksGenres_ibfk_1`;
+ALTER TABLE `booksGenresRecurso` DROP FOREIGN KEY `booksGenres_ibfk_2`;
+ALTER TABLE `instancesRecurso` DROP FOREIGN KEY `instances_ibfk_1`;
+
+-- Dropar as Tabelas
+DROP TABLE IF EXISTS `booksGenresRecurso`;
+DROP TABLE IF EXISTS `instancesRecurso`;
+DROP TABLE IF EXISTS `booksRecurso`;
+DROP TABLE IF EXISTS `genresRecurso`;
+
 CREATE TABLE `booksRecurso` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL
@@ -71,3 +84,4 @@ ALTER TABLE `booksGenresRecurso`
 
 ALTER TABLE `instancesRecurso`
   ADD CONSTRAINT `instances_ibfk_1` FOREIGN KEY (`bookId`) REFERENCES `booksRecurso` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+

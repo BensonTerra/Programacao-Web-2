@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             validate: { notNull: { msg: "Title can not be empty or null!" } }
         },
     }, {
-        tableName: 'booksRecurso', // Força o nome exato da tabela
+        tableName: 'booksrecurso', // Força o nome exato da tabela
         timestamps: false
     });
     

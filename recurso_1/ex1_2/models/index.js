@@ -1,11 +1,10 @@
 const { dbConfig } = require('../utils/config.js');
 const { Sequelize, DataTypes } = require('sequelize');
-const clear = require('clear')
+const clear = require('clear');
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
-    dialect: dbConfig.dialect
-    ,
+    dialect: dbConfig.dialect,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
@@ -17,7 +16,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 (async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection do DB has been established successfully.');
+        console.log('Connection to DB has been established successfully.');
     } catch (err) {
         console.error('Unable to connect to the database:', err);
     }
@@ -26,48 +25,47 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.sequelize = sequelize;
 
-//export TUTORIAL model
+// Export models
+db.book = require("./recursoModels/books.model.js")(sequelize, DataTypes);
+db.bookGenre = require("./recursoModels/booksGenres.model.js")(sequelize, DataTypes);
+db.genre = require("./recursoModels/genres.model.js")(sequelize, DataTypes);
+db.instance = require("./recursoModels/instances.model.js")(sequelize, DataTypes);
+
+// Define associations
+db.book.hasMany(db.instance, { foreignKey: 'bookId', onDelete: 'CASCADE' });
+db.instance.belongsTo(db.book, { foreignKey: 'bookId' });
+
+db.book.belongsToMany(db.genre, { through: db.bookGenre, foreignKey: 'bookId' });
+db.genre.belongsToMany(db.book, { through: db.bookGenre, foreignKey: 'genreName' });
+
+// Define other models and associations
 db.tutorial = require("./tutorials.model.js")(sequelize, DataTypes);
-//export COMMENT model
 db.comment = require("./comments.model.js")(sequelize, DataTypes);
-//export TAG model
 db.tag = require("./tags.model.js")(sequelize, DataTypes);
-//export USER model
 db.user = require("./users.model.js")(sequelize, DataTypes);
 
-// recurso
-db.book = require("./recursoModels/books.model.js")(sequelize, DataTypes);
-
-
-//define the relationships
-
 // 1:N - 1 tutorial, N comments
-// if tutorial is deleted, delete all comments associated with it
 db.tutorial.hasMany(db.comment, { onDelete: 'CASCADE' });
 db.comment.belongsTo(db.tutorial);
 
-//N:M
-db.tutorial.belongsToMany(db.tag, {
-    through: 'TagsInTutorials', timestamps: false
-});
-db.tag.belongsToMany(db.tutorial, {
-    through: 'TagsInTutorials', timestamps: false
-});
+// N:M - tutorial and tag
+db.tutorial.belongsToMany(db.tag, { through: 'TagsInTutorials', timestamps: false });
+db.tag.belongsToMany(db.tutorial, { through: 'TagsInTutorials', timestamps: false });
 
 // 1:N - 1 user, N comments
-db.comment.belongsTo(db.user, {foreignKey: "author"});
-db.user.hasMany(db.comment, {foreignKey: "author"});
+db.comment.belongsTo(db.user, { foreignKey: "author" });
+db.user.hasMany(db.comment, { foreignKey: "author" });
 
-// optionally: SYNC
+// Optionally: SYNC
 (async () => {
     try {
         // await sequelize.sync({ force: true });
         await sequelize.sync({ alter: true });
-        //  await sequelize.sync();
-        clear()
-        console.log('DB is successfully synchronized')
+        // await sequelize.sync();
+        clear();
+        console.log('DB is successfully synchronized');
     } catch (error) {
-        console.log(error)
+        console.error('Error synchronizing the DB:', error);
     }
 })();
 

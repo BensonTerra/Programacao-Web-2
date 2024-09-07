@@ -15,14 +15,15 @@ app.get('/', function (req, res) {
 });
 
 // routing middleware
-/*
+
 app.use('/tutorials', require('./routes/tutorials.routes.js'))
 app.use('/tags', require('./routes/tags.routes.js'))
 app.use('/users', require('./routes/users.routes.js'))
-*/
+
 
 // routing Recurso
 app.use('/books', require('./routes/recursoRoutes/books.routes.js'))
+app.use('/booksGenres', require('./routes/recursoRoutes/booksGenres.route.js'))
 
 // handle invalid routes
 app.all('*', function (req, res) {
