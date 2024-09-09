@@ -24,6 +24,8 @@ app.use('/users', require('./routes/users.routes.js'))
 // routing Recurso
 app.use('/books', require('./routes/recursoRoutes/books.routes.js'))
 app.use('/booksGenres', require('./routes/recursoRoutes/booksGenres.route.js'))
+app.use('/genres', require('./routes/recursoRoutes/genres.routes.js'))
+app.use('/instances', require('./routes/recursoRoutes/instances.route.js'))
 
 // handle invalid routes
 app.all('*', function (req, res) {

@@ -32,10 +32,10 @@ db.genre = require("./recursoModels/genres.model.js")(sequelize, DataTypes);
 db.instance = require("./recursoModels/instances.model.js")(sequelize, DataTypes);
 
 // Define associations
-db.book.hasMany(db.instance, { foreignKey: 'bookId', onDelete: 'CASCADE' });
+db.book.hasMany(db.instance, { foreignKey: 'bookId', as: 'instances', onDelete: 'CASCADE' });
 db.instance.belongsTo(db.book, { foreignKey: 'bookId' });
 
-db.book.belongsToMany(db.genre, { through: db.bookGenre, foreignKey: 'bookId' });
+db.book.belongsToMany(db.genre, { through: db.bookGenre, foreignKey: 'bookId', as: 'genres' });
 db.genre.belongsToMany(db.book, { through: db.bookGenre, foreignKey: 'genreName' });
 
 // Define other models and associations

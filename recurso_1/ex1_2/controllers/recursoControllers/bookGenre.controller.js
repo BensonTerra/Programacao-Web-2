@@ -7,10 +7,8 @@ const { Op, ValidationError } = require('sequelize');
 const clear = require('clear');
 
 exports.findAll = async (req, res, next) => {
-    //res.status(400).json({ success: true, message:Book})
-    clear();//console.log(Book)
+    clear();
 
-    
     //get data from request query string (if not existing, they will be undefined)
     console.log(req.query)
     let { page, size, title } = req.query;
@@ -43,6 +41,7 @@ exports.findAll = async (req, res, next) => {
         })
         console.log(book);
 
+        /*
         // map HATEOAS links to each one of the tutorials
         book.rows.forEach(book => {
             book.links = [
@@ -51,6 +50,7 @@ exports.findAll = async (req, res, next) => {
                 { rel: "modify", href: `/books/${book.id}`, method: "PUT" },
             ]
         });
+        */
 
         // map default response to desired response data structure
         return res.status(200).json({

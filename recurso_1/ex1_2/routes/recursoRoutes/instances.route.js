@@ -1,11 +1,12 @@
 const express = require('express');
-const genreController = require("../../controllers/recursoControllers/genre.controller")
+const instanceController = require("../../controllers/recursoControllers/instance.controller")
 
 //express router
 let router = express.Router();
 
 router.route('/')
-    .get(genreController.findAll)
+    .get(instanceController.findAll)
+    .post(instanceController.create)
 
 router.all('*', function (req, res) {
     //send an predefined error message 
