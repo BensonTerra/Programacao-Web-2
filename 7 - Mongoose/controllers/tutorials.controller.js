@@ -8,13 +8,13 @@ exports.findAll = async (req, res) => {
     let condition = title ? { title: new RegExp(title, 'i') } : {};
     const test = await Tutorial.find({comments:{$exists: true,$not:{$size: 0}}})
     try {
-        /*
+        
         let data = await Tutorial
             .find(condition) //condition: 
             .select('title description published ') // select the fields (it will add _id)
             .select('-__v comments ')
             .exec();
-        */
+        
         return res.status(200).json({ success: true, tutorials: test });
         //return res.status(200).json({ success: true, tutorials: data });
     }
