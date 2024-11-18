@@ -2,8 +2,9 @@ const db = require("../../models/index.js");
 const { ErrorHandler } = require("../../utils/error.js");
 
 const Instance = db.instance;
+const Book = db.book
 
-const { Op, ValidationError } = require('sequelize');
+const { Op, ValidationError, where } = require('sequelize');
 const clear = require('clear');
 
 exports.findAll = async (req, res, next) => {
@@ -103,3 +104,33 @@ exports.create = async (req, res, next) => {
         next(err)
     };
 };
+
+exports.reserveInstance = async(req, res, next) => {
+    try {
+        clear()
+        // Save Book in the database
+        const condition = req.body.title
+        let bookToReserve = await Book.findOne({
+            where: condition
+        }); console.log(bookToReserve)
+
+        if (!req.body.bookId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'A bookId is required to create an instance.'
+            });
+        }
+
+        res.status(201).json({
+            success: true,
+            msg: "Instance successfully created.", 
+            data: bookToReserve,
+        });
+    }
+    catch (err) {
+        // console.log(err.name) // err.name === 'SequelizeValidationError'
+        if (err instanceof ValidationError)
+            err = new ErrorHandler(400, err.errors.map(e => e.message));
+        next(err)
+    };
+}
