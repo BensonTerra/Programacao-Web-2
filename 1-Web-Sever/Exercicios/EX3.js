@@ -1,5 +1,5 @@
 const clear = require('clear'); clear()
-console.log(process.argv)
+//console.log(process.argv)
 
 let hoje = new Date(); console.log(hoje)
 var diaAtual = hoje.getDate();

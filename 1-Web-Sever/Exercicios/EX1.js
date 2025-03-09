@@ -1,3 +1,4 @@
+const clear = require('clear'); clear()
 //console.log(process.argv.slice(2))
 
 const allColors = 
