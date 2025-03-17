@@ -1,17 +1,15 @@
-const mysql = require('mysql');
+const mysql = require("mysql");
 
-//Node.js MySQL database connection 
+//Node.js MySQL database connection
 const connection = mysql.createConnection({
-    host: 'pw2.joaoferreira.eu',
-    user: 'teresaterroso_pw2_user',
-    password: 'Eq&ls9ImiVZ_',
-    database: 'teresaterroso_pw2' 
+  host: "localhost",
+  user: "newuser",
+  password: "newpass",
+  database: "bookstore"
 });
-
 connection.connect((err) => {
-    if (err) throw err;
-    // print success message
-    console.log('Connected to MySQL Server!');
+  if (err) throw err;
+  console.log("Connected to MySQL Server!");
 });
 
-module.exports = connection; 
+module.exports = connection;
