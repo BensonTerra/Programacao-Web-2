@@ -3,24 +3,31 @@
 const http = require('http');
 
 let EX = process.argv.slice(2)
-const {getRandomColor,getAllColors} = require('./EX1.js');
-const {calc} = require('./EX2.js');
-const {calculoDiferenca} = require('./EX3.js');
+const {getMessage} = require('./2-Node_Modules/EX3_message')
+const {getRandomColor,getAllColors} = require("./2-Node_Modules/EX4")
+const {calc} = require('./2-Node_Modules/EX5')
+const {calculoDiferenca} = require('./2-Node_Modules/EXTRA')
 //const {} = require('./EX4.js');
 console.log(EX)
 
-if(EX[0] == "EX1")
+if(EX[0] == "EX3"){
+  getMessage(EX[1])
+}
+else if(EX[0] == "EX4")
 {
   getRandomColor(); 
   getAllColors(); 
   console.log() 
 }
-else if(EX[0] == "EX2")
+else if(EX[0] == "EX5")
 {
   let data = EX.slice(1);
   calc(data)
 }
-else if(EX[0] == "EX3")
+else if(EX[0] == "EXTRA"){
+  calculoDiferenca()
+}
+else if(EX[0] == "EX6")
 {
   const HOST = process.env.HOSTNAME || 'localhost' // local server
   const PORT = process.env.PORT || 3000; // determine the port to listen to by checking the PORT variable first and providing it with a default value, if undefined
