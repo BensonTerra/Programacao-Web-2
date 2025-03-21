@@ -16,9 +16,6 @@ const port = process.env.PORT || 3000; // port to listen to
 const server = http.createServer((request, response) => {
   const parsedURL = new URL(request.url, `http://${request.headers.host}`);
 
-  //check the URL of the current requestâ€‹
-  // ALTERED BECAUSE IN PUT & DELETE REQUESTS THE request.url INCLUDES query string
-  // if (request.url == '/authors') {
   if (parsedURL.pathname == "/authors") {
     // look for HTTP verbs> GET, POST, PUT or DELETE
     if (request.method == "GET") {
@@ -82,7 +79,8 @@ const server = http.createServer((request, response) => {
         });
       } 
       else if (request.method == "PUT") {
-        let ID = parsedURL.searchParams.get("id");
+        let ID = parsedURL.searchParams.get("id"); //console.log(ID);
+        
         if (ID == null) {
           //set response for bad request
           response.writeHead(INVALID_FILTER.statusCode, {
@@ -122,7 +120,11 @@ const server = http.createServer((request, response) => {
               if (results.affectedRows == 1) {
                 // DB responds with # of authors affected by UPDATE
                 response.statusCode = 204;
-                response.end();
+                response.end(
+                  JSON.stringify({
+                    message: "author successfully updated",
+                  })
+                );
                 return;
               } else {
                 //set response for AUTHOR not found
@@ -160,7 +162,9 @@ const server = http.createServer((request, response) => {
 
             if (results.affectedRows == 1) {
               response.statusCode = 204;
-              response.end();
+              response.end(
+                JSON.stringify({ message: "author successfully deleted" })
+              );
             } else {
               //set response for AUTHOR not found
               response.writeHead(AUTHOR_NOT_FOUND.statusCode, {
