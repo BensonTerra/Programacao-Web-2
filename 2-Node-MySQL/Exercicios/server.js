@@ -119,7 +119,7 @@ const server = http.createServer((request, response) => {
               }
               if (results.affectedRows == 1) {
                 // DB responds with # of authors affected by UPDATE
-                response.statusCode = 204;
+                response.writeHead(200, { "Content-Type": "application/json" }); // Use 200 OK
                 response.end(
                   JSON.stringify({
                     message: "author successfully updated",
