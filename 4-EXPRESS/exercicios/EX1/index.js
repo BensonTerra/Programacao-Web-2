@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 // Rota GET na URL "/Teste"
 app.get('/Teste', (req, res) => {
     res.send('<html><body><h1>Teste de route</h1></body></html>');
-});/
+});
 
 // Rota GET na URL "/users" para obter todos os usuários
 app.get('/users', (req, res) => {
