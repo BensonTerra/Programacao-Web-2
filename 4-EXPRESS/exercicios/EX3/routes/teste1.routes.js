@@ -5,6 +5,7 @@ const teste1Controller = require("../controllers/teste1.controller");
 
 // Rota ('/'))
 router.route('/')
+.get(teste1Controller.findAll)
 
 // Rota ('/:products')
 router.route('/products')

@@ -1,24 +1,38 @@
 const db = require("../models/index.js");
 const Tutorial = db.tutorial;
 
-//"Op" necessary for LIKE operator
+// "Op" necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
-
 
 // Display list of all tutorials (with pagination)
 exports.findAll = async (req, res) => {
     try {
+        // Buscar todos os registros de tutorial no banco de dados
+        const tutorials = await Tutorial.findAll();
+
+        // Verificar se a consulta retornou dados
+        if (!tutorials.length) {
+            return res.status(404).json({
+                success: false,
+                msg: "No tutorials found."
+            });
+        }
+
+        // Retornar os dados encontrados
         res.status(200).json({
             success: true,
-            data: []
+            data: tutorials
         });
     }
     catch (err) {
+        // Em caso de erro, retornar a mensagem de erro
         res.status(500).json({
-            success: false, msg: err.message || "Some error occurred while retrieving the tutorials."
-        })
+            success: false,
+            msg: err.message || "Some error occurred while retrieving the tutorials."
+        });
     }
 };
+
 
 // Handle tutorial create on POST
 exports.create = async (req, res) => {

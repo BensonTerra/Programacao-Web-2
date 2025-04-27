@@ -28,16 +28,16 @@ db.sequelize = sequelize;
 //export TUTORIAL model
 db.tutorial = require("./tutorials.model.js")(sequelize, DataTypes);
 
-// // optionally: SYNC
-// (async () => {
-//     try {
-//         // await sequelize.sync({ force: true }); // creates tables, dropping them first if they already existed
-//         // await sequelize.sync({ alter: true }); // checks the tables in the database (which columns they have, what are their data types, etc.), and then performs the necessary changes to make then match the models
-//         // await sequelize.sync(); // creates tables if they don't exist (and does nothing if they already exist)
-//         console.log('DB is successfully synchronized')
-//     } catch (error) {
-//         console.log(error)
-//     }
-// })();
+// optionally: SYNC
+(async () => {
+    try {
+         await sequelize.sync({ force: true }); // creates tables, dropping them first if they already existed
+        // await sequelize.sync({ alter: true }); // checks the tables in the database (which columns they have, what are their data types, etc.), and then performs the necessary changes to make then match the models
+        // await sequelize.sync(); // creates tables if they don't exist (and does nothing if they already exist)
+        console.log('DB is successfully synchronized')
+    } catch (error) {
+        console.log(error)
+    }
+})();
 
 module.exports = db;

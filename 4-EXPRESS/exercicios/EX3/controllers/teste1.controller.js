@@ -1,6 +1,6 @@
 // import movies data
 let arrays = require("../models/teste1.model");
-let products = arrays.products;//console.log(products)
+let arrayProducts = arrays.products;//console.log(products)
 let purchases = arrays.purchases;//console.log(purchases)
 let array
 // exports custom request payload validation middleware
@@ -8,7 +8,7 @@ let array
 exports.bodyValidator = (req, res, next) => {;
   if(req.url=='/products'){
     console.log("check")
-    array=products
+    array=arrayProducts
     if(!checkArrayProducts(req, array) && req.method=='POST') {
       next()
     }
@@ -18,13 +18,22 @@ exports.bodyValidator = (req, res, next) => {;
   }
 };
 
+exports.findAll = (req, res) => {
+  console.log("findAll");
+
+  res.json({
+    products: arrayProducts,    // <-- seu array de produtos
+    purchases: purchases   // <-- seu array de compras
+  });
+};
+
 exports.findAllProducts = (req, res) => {
-  res.json(products);
+  res.json(arrayProducts);
 };
 
 exports.findOneProduct = async (req, res) => {
   // obtains only a single entry from the table, using the provided primary key
-  let product = products.find( product => product.id == req.params.idP); console.log(product);
+  let product = arrayProducts.find( product => product.id == req.params.idP); console.log(product);
 
   // if tutorial was not found
   if (product === null)
@@ -46,12 +55,10 @@ exports.create = (req, res) => {
   req.body.id = checkLastId(array);
   //res.json(req.body)
   array.push(req.body);
-  res.json(products);
+  res.json(arrayProducts);
   
   //res.json("ok")
 }
-
-
 
 exports.findAllPurchases = (req, res) => {
   res.json(purchases);
