@@ -3,8 +3,8 @@ const express = require('express');
 const cors = require('cors');       // middleware to enable CORS (Cross-Origin Resource Sharing)
 
 const app = express();
-const port = process.env.PORT;	 	
 const host = process.env.HOST;
+const port = process.env.PORT;	 	
 
 app.use(cors()); //enable ALL CORS requests (client requests from other domain)
 app.use(express.json()); //enable parsing JSON body data

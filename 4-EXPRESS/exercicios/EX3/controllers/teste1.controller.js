@@ -27,7 +27,6 @@ exports.findAll = (req, res) => {
   });
 };
 
-
 exports.findAllProducts = (req, res) => {
   res.json(arrayProducts);
 };
@@ -60,8 +59,6 @@ exports.create = (req, res) => {
   
   //res.json("ok")
 }
-
-
 
 exports.findAllPurchases = (req, res) => {
   res.json(purchases);
