@@ -6,9 +6,13 @@ let router = express.Router();
 
 router.route('/')
     .get(userController.findAll)
+    .post(userController.create)
 
 router.route('/:idUser')
     .get(userController.findOne)
+
+router.route('/login')
+    .post(userController.login)
 
 
 router.all('*', function (req, res) {

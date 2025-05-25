@@ -3,21 +3,28 @@ module.exports = function (sequelize, DataTypes) {
   return sequelize.define('Users', {
     username: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false,
       validate: {
-        notNull: { msg: "Username cannot be empty or null!" }
+        notNull: { msg: "Username não pode estar vazio." },
+        notEmpty: { msg: "Username não pode estar vazio." }
       }
     },
     email: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: { msg: "Email inválido." },
+        notNull: { msg: "Email não pode ser nulo." },
+        notEmpty: { msg: "Email não pode estar vazio." }
+      }
     },
     password: {
       type: DataTypes.STRING,
-      trim: true, // remove spaces on both ends             
       allowNull: false,
       validate: {
-        notNull: { msg: "Password cannot be empty or null!" }
+        notNull: { msg: "Password não pode ser nula." },
+        notEmpty: { msg: "Password não pode estar vazia." }
       }
     },
     role: {
@@ -26,7 +33,7 @@ module.exports = function (sequelize, DataTypes) {
       validate: {
         isIn: {
           args: [['admin', 'facilitador', 'estudante']],
-          msg: "Allowed roles: facilitador ou estudante"
+          msg: "Role inválido. Use: admin, facilitador ou estudante"
         }
       }
     }
