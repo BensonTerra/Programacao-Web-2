@@ -61,12 +61,14 @@ exports.create = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
     try {
+        clear();
         if (!req.body || !req.body.username || !req.body.password)
             throw new ErrorHandler(400, "Failed! Must provide username and password.");
 
         let user = await User.findOne({
             where: { username: req.body.username }
-        });
+        }); //console.log(`user: ${user.username}, ${user.email}, ${user.password}`);
+        
         if (!user)
             throw new ErrorHandler(404, "User not found.");
 
@@ -90,8 +92,10 @@ exports.login = async (req, res, next) => {
     
         return res.status(200).json({
             success: true,
+            message: "Login realizado com sucesso.",
             accessToken: token
         });
+
 
     } catch (err) {
         if (err instanceof ValidationError)
@@ -146,7 +150,7 @@ exports.findAll = async (req, res, next) => {
             success: true,
             data: users.rows,
             links: [
-                { rel: "GET AllUsers", href: `/users`, method: "GET" }
+                { rel: "GET All_Users", href: `/users`, method: "GET" }
             ]
 
         });

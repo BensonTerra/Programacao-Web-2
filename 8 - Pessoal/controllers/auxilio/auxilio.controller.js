@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const { JWTconfig } = require("../utils/config.js");
-const { ErrorHandler } = require("../utils/error.js");
+const { JWTconfig } = require("../../utils/config.js");
+const { ErrorHandler } = require("../../utils/error.js");
 
-const db = require("../models/index.js");
+const db = require("../../models/index.js");
 const User = db.user;
 
 const { ValidationError } = require('sequelize');

@@ -27,12 +27,13 @@ db.sequelize = sequelize;
 
 // Define other models and associations
 db.user = require("./users.model.js")(sequelize, DataTypes);
-
+db.accommodation = require("./accommodation.model.js")(sequelize, DataTypes);
+db.events = require("./events.model.js")(sequelize, DataTypes);
 // Optionally: SYNC
 (async () => {
     try {
-        //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ force: true });
+        //await sequelize.sync({ alter: true });
         // await sequelize.sync();
         clear();
         console.log('DB is successfully synchronized');
