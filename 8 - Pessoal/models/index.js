@@ -4,6 +4,7 @@ const clear = require('clear');
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
+    port: dbConfig.PORT,
     dialect: dbConfig.dialect,
     pool: {
         max: dbConfig.pool.max,
@@ -48,7 +49,7 @@ db.events.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'ev
 (async () => {
     try {
         //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
+        //await sequelize.sync({ alter: true });
         // await sequelize.sync();
         clear();
         console.log('DB is successfully synchronized');
