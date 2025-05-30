@@ -27,13 +27,28 @@ db.sequelize = sequelize;
 
 // Define other models and associations
 db.user = require("./users.model.js")(sequelize, DataTypes);
-db.accommodation = require("./accommodation.model.js")(sequelize, DataTypes);
+db.accommodation = require("./accommodations.model.js")(sequelize, DataTypes);
 db.events = require("./events.model.js")(sequelize, DataTypes);
+db.booking = require("./bookings.model.js")(sequelize, DataTypes);
+
+db.user.hasMany(db.booking, { foreignKey: 'userId', as: 'bookings' });
+db.booking.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
+
+db.events.hasMany(db.booking, { foreignKey: 'eventId', as: 'bookings' });
+db.booking.belongsTo(db.events, { foreignKey: 'eventId', as: 'event' });
+
+db.accommodation.hasMany(db.booking, { foreignKey: 'accommodationId', as: 'bookings' });
+db.booking.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
+
+db.user.belongsToMany(db.events, { through: 'UserEventInterest', foreignKey: 'userId', otherKey: 'eventId' });
+db.events.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eventId', otherKey: 'userId' });
+
+
 // Optionally: SYNC
 (async () => {
     try {
-        await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+        //await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
         // await sequelize.sync();
         clear();
         console.log('DB is successfully synchronized');
