@@ -1,5 +1,7 @@
 const express = require('express');
+const authController = require("../controllers/auth.controller");
 const accommodationController = require("../controllers/accommodations.controller");
+const bookingsController = require("../controllers/booking.controller");  // controlador das reservas
 
 // express router
 let router = express.Router();
@@ -10,6 +12,9 @@ router.route('/')
 
 router.route('/:idAccommodation')
     .get(accommodationController.findOne)
+
+router.route('/:idAccommodation/reserva')
+    .post(authController.verifyToken, bookingsController.create);
 
 router.all('*', function (req, res) {
     //send an predefined error message 

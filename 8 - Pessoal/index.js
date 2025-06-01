@@ -15,7 +15,6 @@ app.get('/', function (req, res) {
 });
 
 // routing middleware
-
 app.use('/users', require('./routes/users.routes.js'))
 app.use('/accommodation', require('./routes/accommodation.routes.js'));
 app.use('/events', require('./routes/event.routes.js'));

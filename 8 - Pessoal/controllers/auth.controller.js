@@ -9,20 +9,17 @@ const User = db.user;
 
 exports.verifyToken = (req, res, next) => {
     try {
-        // search token can be in the headers most commonly used for authentication
         const header = req.headers['x-access-token'] || req.headers.authorization;
 
         if (typeof header == 'undefined')
             throw new ErrorHandler(401, "No token provided!");
 
-        // Authorization header format: Bearer <token>
         let token, bearer = header.split(' ');
+
         if (bearer.length == 2)
             token = bearer[1];
         else
             token = header;
-
-        //jsonwebtoken's verify() function
 
         let decoded = jwt.verify(token, JWTconfig.SECRET);
         req.loggedUserId = decoded.id;
@@ -54,4 +51,28 @@ exports.isAdminOrLoggedUser = async (req, res, next) => {
     next(new ErrorHandler(403, "This request requires an ADMIN Role or you can only see you own data!"));
 };
 
+exports.changeRoleToAdmin = async (req, res, next) => {
+    try {
+        // Apenas administradores podem promover outros usuários
+        if (req.loggedUserRole !== 'admin') {
+            throw new ErrorHandler(403, "Only admins can change user roles.");
+        }
+
+        const userId = req.params.userID;
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            throw new ErrorHandler(404, "User not found.");
+        }
+
+        // Atualiza o papel do usuário para 'admin'
+        user.role = 'admin';
+        await user.save();
+
+        res.status(200).json({ message: `User ${user.email} is now an admin.` });
+
+    } catch (err) {
+        next(err);
+    }
+};
 
