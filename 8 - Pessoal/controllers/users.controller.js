@@ -59,6 +59,9 @@ exports.create = async (req, res, next) => {
 
 };
 
+//patch
+//delete
+
 exports.login = async (req, res, next) => {
     try {
         clear();

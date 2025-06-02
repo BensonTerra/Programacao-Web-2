@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('Bookings', {
+  return sequelize.define('AccomodationBookings', {
     // Chaves primárias e estrangeiras
     id: {
       type: DataTypes.INTEGER,
@@ -18,24 +18,14 @@ module.exports = function (sequelize, DataTypes) {
     },
     accommodationId: {
       type: DataTypes.INTEGER,
-      allowNull: true,  // pode ser null se for inscrição em evento
+      allowNull: true, 
       references: {
         model: 'Accommodations',
         key: 'id',
       },
       defaultValue: null,
     },
-    eventId: {
-      type: DataTypes.INTEGER,
-      allowNull: true,  // pode ser null se for reserva de alojamento
-      references: {
-        model: 'Events',
-        key: 'id',
-      },
-      defaultValue: null,
-    },
 
-    // --- Campos relacionados a reservas de alojamento ---
     data_inicio: {
       type: DataTypes.DATEONLY,
       allowNull: true,
@@ -52,7 +42,6 @@ module.exports = function (sequelize, DataTypes) {
       defaultValue: null,
     },
 
-    // --- Campos comuns ---
     estado: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -62,11 +51,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: '',
-    },
-    data_validacao: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
-      defaultValue: null,
     },
   }, {
     timestamps: false,

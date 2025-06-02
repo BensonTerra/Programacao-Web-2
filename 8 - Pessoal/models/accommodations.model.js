@@ -1,28 +1,33 @@
-const Sequelize = require('sequelize');
+const Sequelize = require("sequelize");
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('Accommodations', {
+  return sequelize.define("Accommodations", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     // Title and description
     title: {
       type: DataTypes.STRING(200),
       allowNull: false,
       validate: {
         notNull: { msg: "Accommodation title cannot be null." },
-        notEmpty: { msg: "Accommodation title cannot be empty." }
-      }
+        notEmpty: { msg: "Accommodation title cannot be empty." },
+      },
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: true
+      allowNull: true,
     },
 
     // Location and room type
     location: {
       type: DataTypes.STRING(100),
-      allowNull: true
+      allowNull: true,
     },
     room_type: {
       type: DataTypes.STRING(100),
-      allowNull: true
+      allowNull: true,
     },
 
     // Capacity
@@ -33,9 +38,9 @@ module.exports = function (sequelize, DataTypes) {
         isInt: { msg: "Bed count must be an integer." },
         min: {
           args: [1],
-          msg: "Minimum bed count is 1."
-        }
-      }
+          msg: "Minimum bed count is 1.",
+        },
+      },
     },
 
     // Price and rating
@@ -46,33 +51,35 @@ module.exports = function (sequelize, DataTypes) {
         isDecimal: { msg: "Price per night must be a decimal number." },
         min: {
           args: [0],
-          msg: "Price per night cannot be negative."
-        }
-      }
+          msg: "Price per night cannot be negative.",
+        },
+      },
     },
     rating: {
       type: DataTypes.FLOAT,
       allowNull: true,
       validate: {
         min: { args: [0], msg: "Rating cannot be less than 0." },
-        max: { args: [5], msg: "Rating cannot be more than 5." }
-      }
+        max: { args: [5], msg: "Rating cannot be more than 5." },
+      },
     },
 
     // Availability
     start_date: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     end_date: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     available: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true
+      defaultValue: true,
     },
-  }, {
+  },
+  {
     timestamps: false,
-  });
+  }
+);
 };

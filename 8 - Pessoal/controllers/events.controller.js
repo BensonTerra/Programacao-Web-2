@@ -5,11 +5,15 @@ const { JWTconfig } = require("../utils/config.js");
 const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
-const Event = db.events;
+const Event = db.event;
 
 //necessary for LIKE operator
 const { Op, ValidationError } = require('sequelize');
 const clear = require('clear');
+
+//create
+//patch
+//delete
 
 exports.findAll = async (req, res, next) => {
     clear();

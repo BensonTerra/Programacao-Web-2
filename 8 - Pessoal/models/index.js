@@ -29,27 +29,35 @@ db.sequelize = sequelize;
 // Define other models and associations
 db.user = require("./users.model.js")(sequelize, DataTypes);
 db.accommodation = require("./accommodations.model.js")(sequelize, DataTypes);
-db.events = require("./events.model.js")(sequelize, DataTypes);
-db.booking = require("./bookings.model.js")(sequelize, DataTypes);
+db.event = require("./events.model.js")(sequelize, DataTypes);
+db.accommodationBooking = require("./AccomodationBookings.model.js")(sequelize, DataTypes);
+db.eventBooking = require("./EventBookings.model.js")(sequelize, DataTypes);
 
-db.user.hasMany(db.booking, { foreignKey: 'userId', as: 'bookings' });
-db.booking.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
+// Alojamento: User → AccommodationBookings
+db.user.hasMany(db.accommodationBooking, { foreignKey: 'userId', as: 'accommodationBookings' });
+db.accommodationBooking.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
-db.events.hasMany(db.booking, { foreignKey: 'eventId', as: 'bookings' });
-db.booking.belongsTo(db.events, { foreignKey: 'eventId', as: 'event' });
+db.accommodation.hasMany(db.accommodationBooking, { foreignKey: 'accommodationId', as: 'bookings' });
+db.accommodationBooking.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
 
-db.accommodation.hasMany(db.booking, { foreignKey: 'accommodationId', as: 'bookings' });
-db.booking.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
+// Evento: User → EventBookings
+db.user.hasMany(db.eventBooking, { foreignKey: 'userId', as: 'eventBookings' });
+db.eventBooking.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
-db.user.belongsToMany(db.events, { through: 'UserEventInterest', foreignKey: 'userId', otherKey: 'eventId' });
-db.events.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eventId', otherKey: 'userId' });
+db.event.hasMany(db.eventBooking, { foreignKey: 'eventId', as: 'bookings' });
+db.eventBooking.belongsTo(db.event, { foreignKey: 'eventId', as: 'event' });
+
+// Many-to-Many: Users ↔ Events (interesse)
+db.user.belongsToMany(db.event, { through: 'UserEventInterest', foreignKey: 'userId', otherKey: 'eventId' });
+db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eventId', otherKey: 'userId' });
+
 
 
 // Optionally: SYNC
 (async () => {
     try {
-        //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
+        await sequelize.sync({ force: true });
+        //await sequelize.sync({ alter: true });
         // await sequelize.sync();
         clear();
         console.log('DB is successfully synchronized');

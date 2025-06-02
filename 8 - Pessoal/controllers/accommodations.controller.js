@@ -11,6 +11,11 @@ const Accommodation = db.accommodation;
 const { Op, ValidationError } = require('sequelize');
 const clear = require('clear');
 
+//create
+
+//patch
+//delete
+
 exports.findAll = async (req, res, next) => {
     clear();
     //get data from request query string (if not existing, they will be undefined)
