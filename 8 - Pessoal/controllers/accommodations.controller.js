@@ -12,53 +12,6 @@ const User = db.user;
 const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
-exports.create = async (req, res, next) => {
-  try {
-    clear();
-
-    let newAccommodation = await Accommodation.create({
-      createdByUserId: req.loggedUserId,
-      title: req.body.title,
-      description: req.body.description,
-      location: req.body.location,
-      room_type: req.body.room_type,
-      bed_count: req.body.bed_count,
-      price_per_night: req.body.price_per_night,
-      rating: null,
-      start_date: req.body.startDate,
-      end_date: req.body.endDate,
-      available: true
-    });
-
-    return res.json({
-      success: true,
-      data: newAccommodation,
-      links: [
-        {
-          rel: "modify",
-          href: `/accomodations/${newAccommodation.id}`,
-          method: "PUT",
-        },
-        {
-          rel: "delete",
-          href: `/accomodations/${newAccommodation.id}`,
-          method: "DELETE",
-        },
-      ],
-    });
-  } catch (err) {
-    console.error("Erro ao criar accommodation:", err);
-    return res.status(400).json({
-      success: false,
-      msg: err.message,
-      errors: err.errors ? err.errors.map((e) => e.message) : null,
-    });
-  }
-};
-
-//patch
-//delete
-
 exports.findAll = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
@@ -191,29 +144,50 @@ through: { attributes: [] }
   }
 };
 
-exports.findAllByFacilitador = async (req, res, next) => {
-  clear();
-  //get data from request query string (if not existing, they will be undefined)
-  let { page, size, title } = req.query;
+exports.create = async (req, res, next) => {
+  try {
+    clear();
 
-  // validate page
-  if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
-    return res
-      .status(400)
-      .json({ message: "Page number must be 0 or a positive integer" });
-  page = parseInt(page); // if OK, convert it into an integer
+    let newAccommodation = await Accommodation.create({
+      createdByUserId: req.loggedUserId,
+      title: req.body.title,
+      description: req.body.description,
+      location: req.body.location,
+      room_type: req.body.room_type,
+      bed_count: req.body.bed_count,
+      price_per_night: req.body.price_per_night,
+      rating: null,
+      start_date: req.body.startDate,
+      end_date: req.body.endDate,
+      available: true
+    });
 
-  // validate size
-  if (size && !req.query.size.match(/^([1-9]\d*)$/g))
-    return res.status(400).json({ message: "Size must be a positive integer" });
-  size = parseInt(size); // if OK, convert it into an integer
-
-  // Sequelize function findAndCountAll parameters:
-  //      limit -> number of rows to be retrieved
-  //      offset -> number of rows to be offseted (not retrieved)
-  const limit = size ? size : 3; // limit = size (default is 3)
-  const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
-
-  // search by title require to build a query with the operator L
-  const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+    return res.json({
+      success: true,
+      data: newAccommodation,
+      links: [
+        {
+          rel: "modify",
+          href: `/accomodations/${newAccommodation.id}`,
+          method: "PUT",
+        },
+        {
+          rel: "delete",
+          href: `/accomodations/${newAccommodation.id}`,
+          method: "DELETE",
+        },
+      ],
+    });
+  } catch (err) {
+    console.error("Erro ao criar accommodation:", err);
+    return res.status(400).json({
+      success: false,
+      msg: err.message,
+      errors: err.errors ? err.errors.map((e) => e.message) : null,
+    });
+  }
 };
+
+//patch
+//delete
+
