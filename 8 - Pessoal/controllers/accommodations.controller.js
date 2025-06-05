@@ -61,7 +61,7 @@ exports.create = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
-  let { page, size, title, createdByUserId } = req.query;
+  let { page, size, title, createdByUserId, available } = req.query;
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -79,8 +79,8 @@ exports.findAll = async (req, res, next) => {
 const condition = {
   ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
   ...(createdByUserId ? { createdByUserId: { [Op.eq]: createdByUserId } } : {}),
-  ...(available ? { available: { [Op.eq]: true } } : {})
-};
+  ...(available ? { available: { [Op.eq]: available } } : {})
+}; 
 
 
   // Sequelize function findAndCountAll parameters:

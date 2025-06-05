@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
       createdByUserId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: null,
+        defaultValue: 0,
         references: {
           model: "Users",
           key: "id",
