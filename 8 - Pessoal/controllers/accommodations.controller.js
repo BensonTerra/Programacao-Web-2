@@ -11,7 +11,53 @@ const Accommodation = db.accommodation;
 const { Op, ValidationError } = require('sequelize');
 const clear = require('clear');
 
-//create
+exports.create = async (req, res, next) => {
+    try {
+        clear();
+
+        // Verifica se já existe um usuário com o mesmo e-mail
+        const existingUser = await User.findOne({ where: { email: req.body.email } }); 
+        //console.log(`existingUser: ${existingUser}`);
+        
+
+        if (existingUser) {
+            return res.status(409).json({
+                success: false,
+                message: "Já existe um usuário com esse e-mail."
+            });
+        }
+
+        //console.log(`req.body: ${req.body.username}, ${req.body.email}, ${req.body.password}`);
+
+        // Cria o novo usuário
+        let user = await User.create({
+            username: req.body.username,
+            email: req.body.email,
+            password: bcrypt.hashSync(req.body.password, 10),
+        });
+        //console.log(`user: ${user}`);
+        
+
+        // Retorna o usuário criado com os links HATEOAS
+        return res.status(201).json({
+            success: true,
+            data: user,
+            links: [
+                { rel: "self", href: `/users/${user.id}`, method: "GET" },
+                { rel: "modify", href: `/users/${user.id}`, method: "PUT" },
+                { rel: "delete", href: `/users/${user.id}`, method: "DELETE" },
+            ]
+        });
+    } catch (err) {
+        console.error("Erro ao criar usuário:", err);
+        return res.status(400).json({
+            success: false,
+            msg: err.message,
+            errors: err.errors ? err.errors.map(e => e.message) : null
+        });
+    }
+
+};
 
 //patch
 //delete
@@ -114,3 +160,31 @@ exports.findOne = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.findAllByFacilitador = async (req, res, next) => {
+    clear();
+    //get data from request query string (if not existing, they will be undefined)
+    let { page, size, title } = req.query;
+
+    // validate page
+    if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
+        return res.status(400).json({ message: 'Page number must be 0 or a positive integer' });
+    page = parseInt(page); // if OK, convert it into an integer
+
+    // validate size
+    if (size && !req.query.size.match(/^([1-9]\d*)$/g))
+        return res.status(400).json({ message: 'Size must be a positive integer' });
+    size = parseInt(size); // if OK, convert it into an integer
+
+    // Sequelize function findAndCountAll parameters: 
+    //      limit -> number of rows to be retrieved
+    //      offset -> number of rows to be offseted (not retrieved)
+    const limit = size ? size : 3;          // limit = size (default is 3)
+    const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
+
+    // search by title require to build a query with the operator L
+    const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+
+    
+
+}

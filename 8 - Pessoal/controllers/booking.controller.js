@@ -9,7 +9,7 @@ const AccommodationBooking = db.accommodationBooking;
 const EventBooking = db.eventBooking;
 const Accommodation = db.accommodation;
 const Event = db.event;
-const novaReserva = {};
+let novaReserva = {};
 
 //necessary for LIKE operator
 const { Op, ValidationError, and } = require("sequelize");
@@ -22,7 +22,7 @@ exports.create = async (req, res) => {
     const accommodationId = req.params.idAccommodation ? parseInt(req.params.idAccommodation) : null;
     const eventId = req.params.idEvent ? parseInt(req.params.idEvent) : null;
 
-    console.log(userId, accommodationId, eventId);
+    //console.log(userId, accommodationId, eventId);
 
     const { DataInicio, DataFim, NumPessoas } = req.body;
 
@@ -36,7 +36,7 @@ exports.create = async (req, res) => {
           });
         }
 
-        const alojamento = await Accommodation.findByPk(accommodationId); console.log(alojamento);
+        const alojamento = await Accommodation.findByPk(accommodationId); //console.log(alojamento);
         if (!alojamento) {
           return res
             .status(404)
@@ -107,6 +107,7 @@ exports.create = async (req, res) => {
     }
 
     return res.status(201).json({
+      success: true,
       message: accommodationId ? "Reserva de alojamento criada com sucesso." : "Inscrição em evento criada com sucesso.",
       dados: novaReserva,
     });

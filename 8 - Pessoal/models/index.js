@@ -55,11 +55,12 @@ db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eve
 
 // Optionally: SYNC
 (async () => {
-    try {
-        await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+    try {;
+        //await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
         // await sequelize.sync();
-        clear();
+
+        clear()
         console.log('DB is successfully synchronized');
     } catch (error) {
         console.error('Error synchronizing the DB:', error);
