@@ -51,6 +51,9 @@ db.eventBooking.belongsTo(db.event, { foreignKey: 'eventId', as: 'event' });
 db.user.belongsToMany(db.event, { through: 'UserEventInterest', foreignKey: 'userId', otherKey: 'eventId' });
 db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eventId', otherKey: 'userId' });
 
+// ASSOCIAÇÃO: User → Accommodations
+db.user.hasMany(db.accommodation, { foreignKey: 'userId', as: 'accommodations' });
+db.accommodation.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
 
 // Optionally: SYNC
