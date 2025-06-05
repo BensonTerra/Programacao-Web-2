@@ -53,8 +53,7 @@ db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eve
 
 // ASSOCIAÇÃO: User → Accommodations
 db.user.hasMany(db.accommodation, { foreignKey: 'createdByUserId', as: 'accommodations' });
-db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'user' });
-
+db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
 
 // Optionally: SYNC
 (async () => {
