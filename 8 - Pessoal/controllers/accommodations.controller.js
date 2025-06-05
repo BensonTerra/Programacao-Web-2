@@ -6,6 +6,7 @@ const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
 const Accommodation = db.accommodation;
+const User = db.user;
 
 //necessary for LIKE operator
 const { Op, ValidationError } = require("sequelize");
@@ -61,7 +62,21 @@ exports.create = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
-  let { page, size, title, createdByUserId, available } = req.query;
+  let { creatorName, title, page, size, available } = req.query;
+  //console.log(`Query params: title=${title}, page=${page}, size=${size}, available=${available}, creatorName=${creatorName}`);
+  
+  let include = [];
+
+  if (creatorName) {
+    include.push({
+      model: User,
+      as: 'creator',
+      where: {
+        username: { [Op.like]: `%${creatorName}%` }, // ou [Op.like] dependendo do banco
+      },
+      attributes: [], // não retorna os dados do user, apenas usa para filtro
+    });
+  }; console.log(JSON.stringify(include, null, 2));
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -78,10 +93,8 @@ exports.findAll = async (req, res, next) => {
   // search by title require to build a query with the operator L
 const condition = {
   ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
-  ...(createdByUserId ? { createdByUserId: { [Op.eq]: createdByUserId } } : {}),
   ...(available ? { available: { [Op.eq]: available } } : {})
-}; 
-
+};
 
   // Sequelize function findAndCountAll parameters:
   // limit -> number of rows to be retrieved
@@ -92,9 +105,10 @@ const condition = {
   try {
     let Accomodations = await Accommodation.findAndCountAll({
       where: condition,
+      include,
       limit,
       offset,
-      raw: true,
+      //raw: true,
     });
 
     /* map HATEOAS links to each one of the Accomodations
