@@ -273,9 +273,8 @@ exports.create = async (req, res, next) => {
       bed_count: req.body.bed_count,
       price_per_night: req.body.price_per_night,
       rating: null,
-      start_date: req.body.startDate,
-      end_date: req.body.endDate,
-      available: true,
+      available_from: req.body.startDate,
+      available_to: req.body.endDate,
     });
 
     return res.json({
@@ -304,6 +303,7 @@ exports.create = async (req, res, next) => {
   }
 };
 
-//patch
+/*patch*/
 
-//delete
+
+/*delete*/
