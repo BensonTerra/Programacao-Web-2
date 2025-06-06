@@ -8,7 +8,8 @@ let router = express.Router();
 
 router.route('/')
     .get(accommodationController.findAll)
-    .post(authController.verifyToken, authController.isFacilitador, accommodationController.create)
+    .get(authController.verifyToken, authController.isAdminFacilitador, accommodationController.findAllMyAccommodations) // get all accommodations for facilitators
+    .post(authController.verifyToken, authController.isAdminFacilitador, accommodationController.create)
 
 router.route('/:idAccommodation')
     .get(accommodationController.findOne)

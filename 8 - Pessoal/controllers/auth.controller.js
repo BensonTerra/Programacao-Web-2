@@ -36,15 +36,15 @@ exports.verifyToken = (req, res, next) => {
         return next(err)
     }
 };
-exports.isFacilitador = async (req, res, next) => {
+exports.isAdminFacilitador = async (req, res, next) => {
     if (req.loggedUserRole === "facilitador")
         return next();
 
     next(new ErrorHandler(403, "This request requires facilitador role!"))
 };
 
-exports.isAdmin = async (req, res, next) => {
-    if (req.loggedUserRole === "admin")
+exports.isAdminFacilitador = async (req, res, next) => {
+    if (req.loggedUserRole === "admin" || req.loggedUserRole === "facilitador")
         return next();
 
     next(new ErrorHandler(403, "This request requires ADMIN role!"))

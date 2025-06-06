@@ -15,8 +15,19 @@ const clear = require("clear");
 exports.findAll = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
-  let { creatorName, title, page, size, available } = req.query;
-  //console.log(`Query params: title=${title}, page=${page}, size=${size}, available=${available}, creatorName=${creatorName}`);
+  let { 
+    creatorName, 
+    title,
+    location,
+    room_type,
+    bed_count,
+    price_per_night,
+    start_date,
+    end_date, 
+    available,
+    page, 
+    size, 
+  } = req.query;
   
   let include = [];
 
@@ -29,7 +40,7 @@ exports.findAll = async (req, res, next) => {
       },
       attributes: [], // não retorna os dados do user, apenas usa para filtro
     });
-  }; console.log(JSON.stringify(include, null, 2));
+  }; //console.log(JSON.stringify(include, null, 2));
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -46,13 +57,12 @@ exports.findAll = async (req, res, next) => {
   // search by title require to build a query with the operator L
 const condition = {
   ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
-  ...(available ? { available: { [Op.eq]: available } } : {})
 };
 
   // Sequelize function findAndCountAll parameters:
   // limit -> number of rows to be retrieved
   // Offset -> number of rows to be offseted (not retrieved)
-  const limit = size ? size : 3; // limit = size (default is 3)
+  const limit = size ? size : 5; // limit = size (default is 5)
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
   try {
@@ -61,7 +71,7 @@ const condition = {
       include,
       limit,
       offset,
-      //raw: true,
+      raw: true,
     });
 
     /* map HATEOAS links to each one of the Accomodations
@@ -191,3 +201,35 @@ exports.create = async (req, res, next) => {
 //patch
 //delete
 
+exports.findAllMyAccommodations = async (req, res, next) => {
+  try {
+    clear();
+    const userId = req.loggedUserId;
+
+    // Busca todas as acomodações criadas pelo utilizador autenticado
+    const accommodations = await Accommodation.findAll({
+      where: { createdByUserId: userId },
+      raw: true,
+    });
+
+    // Se não encontrar acomodações, lança erro 404
+    if (!accommodations || accommodations.length === 0) {
+      throw new ErrorHandler(404, "No accommodations found for this user.");
+    }
+
+    // Retorna os dados das acomodações com links HATEOAS
+    return res.json({
+      success: true,
+      data: accommodations,
+      links: [
+        {
+          rel: "GET My_Accommodations",
+          href: `/accommodations/my`,
+          method: "GET",
+        },
+      ],
+    });
+  } catch (err) {
+    next(err);
+  }
+}

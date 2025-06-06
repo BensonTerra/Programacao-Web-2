@@ -88,8 +88,8 @@ exports.login = async (req, res, next) => {
         // sign the given payload (user ID) into a JWT payload – builds JWT token, using secret key
         const token = jwt.sign({ id: user.id, role: user.role },
             JWTconfig.SECRET, {
-            // expiresIn: '24h' // 24 hours
-            expiresIn: '20m' // 20 minutes
+            expiresIn: '24h' // 24 hours
+            // expiresIn: '20m' // 20 minutes
             // expiresIn: '1s' // 1 second
         });
     

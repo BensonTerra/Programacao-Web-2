@@ -6,7 +6,7 @@ const userController = require("../controllers/users.controller");
 let router = express.Router();
 
 router.route('/')
-    .get(authController.verifyToken, authController.isAdmin, userController.findAll)
+    .get(authController.verifyToken, authController.isAdminFacilitador, userController.findAll)
     .post(userController.create)
 
 router.route('/:idUser')
