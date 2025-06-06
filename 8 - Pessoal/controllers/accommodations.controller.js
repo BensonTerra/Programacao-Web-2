@@ -29,7 +29,7 @@ exports.findAll = async (req, res, next) => {
     size,
   } = req.query;
   //console.log(`Query Params: ${JSON.stringify(req.query)}`);
-  
+
   let include = [];
 
   if (creatorName) {
@@ -49,53 +49,50 @@ exports.findAll = async (req, res, next) => {
   };
   //console.log(condition);
 
-if (start_date && end_date) {
-  const startDate = new Date(start_date);
-  const endDate = new Date(end_date);
+  if (start_date && end_date) {
+    const startDate = new Date(start_date);
+    const endDate = new Date(end_date);
 
-  // Verifica se a acomodação está disponível no período
-  condition.available_from = { [Op.lte]: startDate };
+    // Verifica se a acomodação está disponível no período
+    condition.available_from = { [Op.lte]: startDate };
+    condition.available_to = { [Op.gte]: endDate };
 
-  condition.available_to = { [Op.gte]: endDate };
-
-  // Verifica se já há reservas no mesmo período
-  const overlappingBookings = await accommodationBooking.findAll({
-    attributes: ['accommodationId'],
-    where: {
-      [Op.or]: [
-        {
-          data_inicio: {
-            [Op.between]: [startDate, endDate],
+    // Verifica se já há reservas no mesmo período
+    const overlappingBookings = await accommodationBooking.findAll({
+      attributes: ["accommodationId"],
+      where: {
+        [Op.or]: [
+          {
+            data_inicio: {
+              [Op.between]: [startDate, endDate],
+            },
           },
-        },
-        {
-          data_fim: {
-            [Op.between]: [startDate, endDate],
+          {
+            data_fim: {
+              [Op.between]: [startDate, endDate],
+            },
           },
-        },
-        {
-          data_inicio: {
-            [Op.lte]: startDate,
+          {
+            data_inicio: {
+              [Op.lte]: startDate,
+            },
+            data_fim: {
+              [Op.gte]: endDate,
+            },
           },
-          data_fim: {
-            [Op.gte]: endDate,
-          },
-        }
-      ]
-    },
-    raw: true,
-  });
+        ],
+      },
+      raw: true,
+    });
 
-  const busyIds = overlappingBookings.map(a => a.accommodationId);
+    const busyIds = overlappingBookings.map((a) => a.accommodationId);
 
-  if (busyIds.length > 0) {
-    condition.id = {
-      [Op.notIn]: busyIds,
-    };
+    if (busyIds.length > 0) {
+      condition.id = {
+        [Op.notIn]: busyIds,
+      };
+    }
   }
-}
-
-
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -125,18 +122,31 @@ if (start_date && end_date) {
     });
 
     /* map HATEOAS links to each one of the Accomodations
-Accomodations.rows.forEach(Accomodation => {
-Accomodation.links = [
-{ rel: "self", href: `/Accomodations/${Accomodation.id}`, method: "GET" },
-{ rel: "modify", href: `/Accomodations/${Accomodation.id}`, method: "PUT" },
-{ rel: "delete", href: `/Accomodations/${Accomodation.id}`, method: "DELETE" },
-]
-});*/
+    Accomodations.rows.forEach(Accomodation => {
+      Accomodation.links = [
+        { rel: "self", href: `/Accomodations/${Accomodation.id}`, method: "GET" },
+        { rel: "modify", href: `/Accomodations/${Accomodation.id}`, method: "PUT" },
+        { rel: "delete", href: `/Accomodations/${Accomodation.id}`, method: "DELETE" },
+      ]
+    });
+    */
 
-    // map default response to desired response data structure
+    // formata a data para 'YYYY-MM-DD'
+    const formatDate = (isoDate) => {
+      if (!isoDate) return null;
+      return new Date(isoDate).toISOString().split('T')[0];
+    }
+
+    // mapeia as acomodações e formata as datas
+    const formattedData = Accomodations.rows.map(acc => ({
+      ...acc,
+      available_from: formatDate(acc.available_from),
+      available_to: formatDate(acc.available_to),
+    }));
+
     return res.status(200).json({
       success: true,
-      data: Accomodations.rows,
+      data: formattedData,
       links: [
         {
           rel: "GET All_Accommodations",
@@ -207,23 +217,36 @@ through: { attributes: [] }
 exports.findAllMyAccommodations = async (req, res, next) => {
   try {
     clear();
-    const userId = req.loggedUserId;
-
+    const userId = req.loggedUserId; //console.log(`UserId: ${userId}`);
+    
     // Busca todas as acomodações criadas pelo utilizador autenticado
-    const accommodations = await Accommodation.findAll({
+    let Accommodations = await Accommodation.findAndCountAll({
       where: { createdByUserId: userId },
       raw: true,
-    });
-
+    }); //console.log(`Accommodations: ${Accommodations}`);
+    
     // Se não encontrar acomodações, lança erro 404
-    if (!accommodations || accommodations.length === 0) {
+    if (!Accommodations || Accommodations.length === 0) {
       throw new ErrorHandler(404, "No accommodations found for this user.");
     }
 
+    // formata a data para 'YYYY-MM-DD'
+    const formatDate = (isoDate) => {
+      if (!isoDate) return null;
+      return new Date(isoDate).toISOString().split('T')[0];
+    }
+
+    // mapeia as acomodações e formata as datas
+    const formattedData = Accommodations.rows.map(acc => ({
+      ...acc,
+      available_from: formatDate(acc.available_from),
+      available_to: formatDate(acc.available_to),
+    }));
+
     // Retorna os dados das acomodações com links HATEOAS
-    return res.json({
+    return res.status(200).json({
       success: true,
-      data: accommodations,
+      data: formattedData,
       links: [
         {
           rel: "GET My_Accommodations",
@@ -284,5 +307,3 @@ exports.create = async (req, res, next) => {
 //patch
 
 //delete
-
-
