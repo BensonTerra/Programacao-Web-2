@@ -6,6 +6,7 @@ const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
 const Accommodation = db.accommodation;
+const accommodationBooking = db.accommodationBooking;
 const User = db.user;
 
 //necessary for LIKE operator
@@ -15,32 +16,81 @@ const clear = require("clear");
 exports.findAll = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
-  let { 
-    creatorName, 
+  let {
+    creatorName,
     title,
     location,
     room_type,
     bed_count,
     price_per_night,
     start_date,
-    end_date, 
-    available,
-    page, 
-    size, 
+    end_date,
+    page,
+    size,
   } = req.query;
+  console.log(`Query Params: ${JSON.stringify(req.query)}`);
   
   let include = [];
 
   if (creatorName) {
     include.push({
       model: User,
-      as: 'creator',
+      as: "creator",
       where: {
         username: { [Op.like]: `%${creatorName}%` }, // ou [Op.like] dependendo do banco
       },
       attributes: [], // não retorna os dados do user, apenas usa para filtro
     });
-  }; //console.log(JSON.stringify(include, null, 2));
+  } //console.log(JSON.stringify(include, null, 2));
+
+  // search by title require to build a query with the operator L
+  const condition = {
+    ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
+  };
+  //console.log(condition);
+
+  const startDate = new Date(start_date);
+  const endDate = new Date(end_date);
+  console.log(`Start Date: ${startDate}, End Date: ${endDate}`);
+
+  // Busca reservas que entram em conflito com o intervalo desejado
+  const overlappingBookings = await accommodationBooking.findAll({
+    attributes: ['accommodationId'],
+    where: {
+      [Op.or]: [
+        {
+          data_inicio: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        {
+          data_fim: {
+            [Op.between]: [startDate, endDate],
+          },
+        },
+        {
+          data_inicio: {
+            [Op.lte]: startDate,
+          },
+          data_fim: {
+            [Op.gte]: endDate,
+          },
+        }
+      ]
+    },
+    raw: true,
+  }); 
+  //console.log(`Overlapping Bookings: ${JSON.stringify(overlappingBookings)}`);
+
+  const busyIds = overlappingBookings.map(a => a.accommodationId);
+  //console.log(`Busy IDs: ${busyIds}`);
+
+  if (busyIds.length > 0) {
+    condition.id = {
+      [Op.notIn]: busyIds,
+    };
+  };
+  console.log(`line 91: ${JSON.stringify(condition)}`);
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -53,11 +103,6 @@ exports.findAll = async (req, res, next) => {
   if (size && !req.query.size.match(/^([1-9]\d*)$/g))
     return res.status(400).json({ message: "Size must be a positive integer" });
   size = parseInt(size); // if OK, convert it into an integer
-
-  // search by title require to build a query with the operator L
-const condition = {
-  ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
-};
 
   // Sequelize function findAndCountAll parameters:
   // limit -> number of rows to be retrieved
@@ -169,7 +214,7 @@ exports.create = async (req, res, next) => {
       rating: null,
       start_date: req.body.startDate,
       end_date: req.body.endDate,
-      available: true
+      available: true,
     });
 
     return res.json({
@@ -232,4 +277,4 @@ exports.findAllMyAccommodations = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-}
+};
