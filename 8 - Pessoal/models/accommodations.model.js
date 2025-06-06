@@ -77,17 +77,13 @@ module.exports = function (sequelize, DataTypes) {
       },
 
       // Availability
-      start_date: {
+      available_from: {
         type: DataTypes.DATE,
         allowNull: true,
       },
-      end_date: {
+      available_to: {
         type: DataTypes.DATE,
         allowNull: true,
-      },
-      available: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
       },
     },
     {

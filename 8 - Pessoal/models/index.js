@@ -56,17 +56,17 @@ db.user.hasMany(db.accommodation, { foreignKey: 'createdByUserId', as: 'accommod
 db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
 
 // Optionally: SYNC
-// (async () => {
-//     try {;
-//         //await sequelize.sync({ force: true });
-//         await sequelize.sync({ alter: true });
-//         // await sequelize.sync();
+(async () => {
+    try {;
+        //await sequelize.sync({ force: true });
+        //await sequelize.sync({ alter: true });
+        await sequelize.sync();
 
-//         clear()
-//         console.log('DB is successfully synchronized');
-//     } catch (error) {
-//         console.error('Error synchronizing the DB:', error);
-//     }
-// })();
+        clear()
+        console.log('DB is successfully synchronized');
+    } catch (error) {
+        console.error('Error synchronizing the DB:', error);
+    }
+})();
 
 module.exports = db;

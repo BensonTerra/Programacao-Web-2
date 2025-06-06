@@ -28,7 +28,7 @@ exports.findAll = async (req, res, next) => {
     page,
     size,
   } = req.query;
-  console.log(`Query Params: ${JSON.stringify(req.query)}`);
+  //console.log(`Query Params: ${JSON.stringify(req.query)}`);
   
   let include = [];
 
@@ -49,11 +49,16 @@ exports.findAll = async (req, res, next) => {
   };
   //console.log(condition);
 
+if (start_date && end_date) {
   const startDate = new Date(start_date);
   const endDate = new Date(end_date);
-  console.log(`Start Date: ${startDate}, End Date: ${endDate}`);
 
-  // Busca reservas que entram em conflito com o intervalo desejado
+  // Verifica se a acomodação está disponível no período
+  condition.available_from = { [Op.lte]: startDate };
+
+  condition.available_to = { [Op.gte]: endDate };
+
+  // Verifica se já há reservas no mesmo período
   const overlappingBookings = await accommodationBooking.findAll({
     attributes: ['accommodationId'],
     where: {
@@ -79,18 +84,18 @@ exports.findAll = async (req, res, next) => {
       ]
     },
     raw: true,
-  }); 
-  //console.log(`Overlapping Bookings: ${JSON.stringify(overlappingBookings)}`);
+  });
 
   const busyIds = overlappingBookings.map(a => a.accommodationId);
-  //console.log(`Busy IDs: ${busyIds}`);
 
   if (busyIds.length > 0) {
     condition.id = {
       [Op.notIn]: busyIds,
     };
-  };
-  console.log(`line 91: ${JSON.stringify(condition)}`);
+  }
+}
+
+
 
   // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
@@ -199,6 +204,39 @@ through: { attributes: [] }
   }
 };
 
+exports.findAllMyAccommodations = async (req, res, next) => {
+  try {
+    clear();
+    const userId = req.loggedUserId;
+
+    // Busca todas as acomodações criadas pelo utilizador autenticado
+    const accommodations = await Accommodation.findAll({
+      where: { createdByUserId: userId },
+      raw: true,
+    });
+
+    // Se não encontrar acomodações, lança erro 404
+    if (!accommodations || accommodations.length === 0) {
+      throw new ErrorHandler(404, "No accommodations found for this user.");
+    }
+
+    // Retorna os dados das acomodações com links HATEOAS
+    return res.json({
+      success: true,
+      data: accommodations,
+      links: [
+        {
+          rel: "GET My_Accommodations",
+          href: `/accommodations/my`,
+          method: "GET",
+        },
+      ],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.create = async (req, res, next) => {
   try {
     clear();
@@ -244,37 +282,7 @@ exports.create = async (req, res, next) => {
 };
 
 //patch
+
 //delete
 
-exports.findAllMyAccommodations = async (req, res, next) => {
-  try {
-    clear();
-    const userId = req.loggedUserId;
 
-    // Busca todas as acomodações criadas pelo utilizador autenticado
-    const accommodations = await Accommodation.findAll({
-      where: { createdByUserId: userId },
-      raw: true,
-    });
-
-    // Se não encontrar acomodações, lança erro 404
-    if (!accommodations || accommodations.length === 0) {
-      throw new ErrorHandler(404, "No accommodations found for this user.");
-    }
-
-    // Retorna os dados das acomodações com links HATEOAS
-    return res.json({
-      success: true,
-      data: accommodations,
-      links: [
-        {
-          rel: "GET My_Accommodations",
-          href: `/accommodations/my`,
-          method: "GET",
-        },
-      ],
-    });
-  } catch (err) {
-    next(err);
-  }
-};
