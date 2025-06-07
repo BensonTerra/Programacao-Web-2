@@ -1,19 +1,19 @@
 const express = require('express');
 const authController = require("../controllers/auth.controller");
-const userController = require("../controllers/users.controller");
+const usersController = require("../controllers/users.controller");
 
 // express router
 let router = express.Router();
 
 router.route('/')
-    .get(authController.verifyToken, authController.isAdminFacilitador, userController.findAll)
-    .post(userController.create)
+    .get(authController.verifyToken, authController.isAdminFacilitador, usersController.findAll)
+    .post(usersController.create)
 
 router.route('/:idUser')
-    .get(userController.findOne)
+    .get(usersController.findOne)
 
 router.route('/login')
-    .post(userController.login)
+    .post(usersController.login)
 
 
 router.all('*', function (req, res) {

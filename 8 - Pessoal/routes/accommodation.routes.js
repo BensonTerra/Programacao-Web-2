@@ -1,20 +1,22 @@
 const express = require('express');
 const authController = require("../controllers/auth.controller");
-const accommodationController = require("../controllers/accommodations.controller");
+const accommodationsController = require("../controllers/accommodations.controller");
 const bookingsController = require("../controllers/booking.controller");  // controlador das reservas
 
 // express router
 let router = express.Router();
 
 router.route('/')
-    .get(accommodationController.findAll)
-    .post(authController.verifyToken, authController.isAdminFacilitador, accommodationController.create)
+    .get(accommodationsController.findAll)
+    .post(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.create)
 
 router.route('/myAccommodations')
-    .get(authController.verifyToken, authController.isAdminFacilitador, accommodationController.findAllMyAccommodations)
+    .get(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.findAllMyAccommodations)
 
 router.route('/:idAccommodation')
-    .get(accommodationController.findOne)
+    .get(accommodationsController.findOne)
+    .patch(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.update)
+    .delete(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.delete);
 
 router.route('/:idAccommodation/reserva')
     .post(authController.verifyToken, bookingsController.create);

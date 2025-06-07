@@ -9,7 +9,6 @@ const Accommodation = db.accommodation;
 const accommodationBooking = db.accommodationBooking;
 const User = db.user;
 
-//necessary for LIKE operator
 const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
@@ -134,11 +133,11 @@ exports.findAll = async (req, res, next) => {
     // formata a data para 'YYYY-MM-DD'
     const formatDate = (isoDate) => {
       if (!isoDate) return null;
-      return new Date(isoDate).toISOString().split('T')[0];
-    }
+      return new Date(isoDate).toISOString().split("T")[0];
+    };
 
     // mapeia as acomodações e formata as datas
-    const formattedData = Accomodations.rows.map(acc => ({
+    const formattedData = Accomodations.rows.map((acc) => ({
       ...acc,
       available_from: formatDate(acc.available_from),
       available_to: formatDate(acc.available_to),
@@ -149,7 +148,7 @@ exports.findAll = async (req, res, next) => {
       data: formattedData,
       links: [
         {
-          rel: "GET All_Accommodations",
+          rel: "self",
           href: `/accommodations`,
           method: "GET",
         },
@@ -170,18 +169,18 @@ exports.findOne = async (req, res, next) => {
     const accommodation = await Accommodation.findByPk(accommodationId, {
       // Deixa a estrutura de include comentada para uso futuro
       /*
-include: [
-{
-model: db.comment,
-attributes: ['id', 'text']
-},
-{
-model: db.tag,
-attributes: ['name'],
-through: { attributes: [] }
-}
-]
-*/
+      include: [
+        {
+          model: db.comment,
+          attributes: ["id", "text"],
+        },
+        {
+          model: db.tag,
+          attributes: ["name"],
+          through: { attributes: [] },
+        },
+      ],
+      */
     });
 
     // Se não encontrar o Accomodation, lança erro 404
@@ -218,13 +217,13 @@ exports.findAllMyAccommodations = async (req, res, next) => {
   try {
     clear();
     const userId = req.loggedUserId; //console.log(`UserId: ${userId}`);
-    
+
     // Busca todas as acomodações criadas pelo utilizador autenticado
     let Accommodations = await Accommodation.findAndCountAll({
       where: { createdByUserId: userId },
       raw: true,
     }); //console.log(`Accommodations: ${Accommodations}`);
-    
+
     // Se não encontrar acomodações, lança erro 404
     if (!Accommodations || Accommodations.length === 0) {
       throw new ErrorHandler(404, "No accommodations found for this user.");
@@ -233,11 +232,11 @@ exports.findAllMyAccommodations = async (req, res, next) => {
     // formata a data para 'YYYY-MM-DD'
     const formatDate = (isoDate) => {
       if (!isoDate) return null;
-      return new Date(isoDate).toISOString().split('T')[0];
-    }
+      return new Date(isoDate).toISOString().split("T")[0];
+    };
 
     // mapeia as acomodações e formata as datas
-    const formattedData = Accommodations.rows.map(acc => ({
+    const formattedData = Accommodations.rows.map((acc) => ({
       ...acc,
       available_from: formatDate(acc.available_from),
       available_to: formatDate(acc.available_to),
@@ -249,8 +248,8 @@ exports.findAllMyAccommodations = async (req, res, next) => {
       data: formattedData,
       links: [
         {
-          rel: "GET My_Accommodations",
-          href: `/accommodations/my`,
+          rel: "self",
+          href: `/accommodations/myAccommodations`,
           method: "GET",
         },
       ],
@@ -277,7 +276,7 @@ exports.create = async (req, res, next) => {
       available_to: req.body.endDate,
     });
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       data: newAccommodation,
       links: [
@@ -304,6 +303,112 @@ exports.create = async (req, res, next) => {
 };
 
 /*patch*/
+exports.update = async (req, res, next) => {
+  try {
+    clear();
+    const accommodationId = req.params.idAccommodation;
+    //console.log(`AccommodationId: ${accommodationId}`);
 
+    // Busca a acomodação por chave primária
+    const accommodation = await Accommodation.findByPk(accommodationId);
+
+    //Obter user logado para garantir que o utilizador autenticado é o dono da acomodação
+    const loggedUserId = req.loggedUserId;
+    //console.log(`Logged UserId: ${loggedUserId}`);
+
+    // Se não encontrar a acomodação, lança erro 404
+    if (!accommodation) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodation with ID ${accommodationId}.`
+      );
+    }
+
+    if (accommodation.createdByUserId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this accommodation.`
+      );
+    }
+
+    // Atualiza os campos da acomodação com os dados do corpo da requisição
+    accommodation.title = req.body.title || accommodation.title;
+    accommodation.description =
+      req.body.description || accommodation.description;
+    accommodation.location = req.body.location || accommodation.location;
+    accommodation.room_type = req.body.room_type || accommodation.room_type;
+    accommodation.bed_count = req.body.bed_count || accommodation.bed_count;
+    accommodation.price_per_night =
+      req.body.price_per_night || accommodation.price_per_night;
+    accommodation.available_from =
+      req.body.startDate || accommodation.available_from;
+    accommodation.available_to = req.body.endDate || accommodation.available_to;
+
+    // Salva as alterações na base de dados
+    await accommodation.save();
+
+    return res.status(200).json({
+      success: true,
+      data: `Accommodation with ID ${accommodationId} updated successfully.`,
+      links: [
+        {
+          rel: "self",
+          href: `/accommodations/${accommodation.id}`,
+          method: "GET",
+        },
+        {
+          rel: "delete",
+          href: `/accommodations/${accommodation.id}`,
+          method: "DELETE",
+        },
+      ],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 /*delete*/
+exports.delete = async (req, res, next) => {
+  try {
+    clear();
+    const accommodationId = req.params.idAccommodation;
+    //console.log(`AccommodationId: ${accommodationId}`);
+
+    // Busca a acomodação por chave primária
+    const accommodation = await Accommodation.findByPk(accommodationId);
+
+    //Obter user logado para garantir que o utilizador autenticado é o dono da acomodação
+    const loggedUserId = req.loggedUserId;
+    //console.log(`Logged UserId: ${loggedUserId}`);
+
+    // Se não encontrar a acomodação, lança erro 404
+    if (!accommodation) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodation with ID ${accommodationId}.`
+      );
+    }
+
+    if (accommodation.createdByUserId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to delete this accommodation.`
+      );
+    }
+
+    accommodation.destroy({
+      where: {
+        id: accommodationId,
+        createdByUserId: loggedUserId,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: `Accommodation with ID ${accommodationId} deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

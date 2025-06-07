@@ -59,7 +59,7 @@ db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creato
 (async () => {
     try {;
         //await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+        await sequelize.sync({ alter: true });
         //await sequelize.sync();
 
         clear()
