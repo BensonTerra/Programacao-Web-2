@@ -30,7 +30,7 @@ db.sequelize = sequelize;
 db.user = require("./users.model.js")(sequelize, DataTypes);
 db.accommodation = require("./accommodations.model.js")(sequelize, DataTypes);
 db.event = require("./events.model.js")(sequelize, DataTypes);
-db.accommodationBooking = require("./AccomodationBookings.model.js")(sequelize, DataTypes);
+db.accommodationBooking = require("./accommodationBookings.model.js")(sequelize, DataTypes);
 db.eventBooking = require("./EventBookings.model.js")(sequelize, DataTypes);
 
 // Alojamento: User → AccommodationBookings

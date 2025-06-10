@@ -8,20 +8,22 @@ let router = express.Router();
 
 router.route('/')
     .get(eventsController.findAll)
-    .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create)
+    .post(authController.verifyToken, authController.isAdminFacilitador, eventsController.create);
 
 router.route('/myEvents')
     .get(authController.verifyToken, authController.isAdminFacilitador, eventsController.findAllMyEvents);
 
-/*
+
 router.route('/:idEvent')
-    .get(bookingsController.findOne)
-    .patch(authController.verifyToken, authController.isAdminFacilitador, bookingsController.update)
-    .delete(authController.verifyToken, authController.isAdminFacilitador, bookingsController.delete);
-*/
+    .get(authController.verifyToken, authController.isAdminFacilitador, eventsController.findOne)
+    .patch(authController.verifyToken, authController.isAdminFacilitador, eventsController.update)
+    .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
+
 
 router.route('/:idEvent/reserva')
-    .post(authController.verifyToken, bookingsController.create);
+    .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create)
+    .patch(authController.verifyToken, authController.isAdminFacilitador, eventsController.update)
+    .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
 
 router.all('*', function (req, res) {
     //send an predefined error message 

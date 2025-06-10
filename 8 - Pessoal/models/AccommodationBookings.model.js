@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('AccomodationBookings', {
+  return sequelize.define('accommodationBookings', {
     // Chaves primárias e estrangeiras
     id: {
       type: DataTypes.INTEGER,

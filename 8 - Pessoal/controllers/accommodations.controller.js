@@ -36,9 +36,9 @@ exports.findAll = async (req, res, next) => {
       model: User,
       as: "creator",
       where: {
-        username: { [Op.like]: `%${creatorName}%` }, // ou [Op.like] dependendo do banco
+        username: { [Op.like]: `%${creatorName}%` },
       },
-      attributes: [], // não retorna os dados do user, apenas usa para filtro
+      attributes: [],
     });
   } //console.log(JSON.stringify(include, null, 2));
 
@@ -112,7 +112,7 @@ exports.findAll = async (req, res, next) => {
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
   try {
-    let Accomodations = await Accommodation.findAndCountAll({
+    let Accommodations = await Accommodation.findAndCountAll({
       where: condition,
       include,
       limit,
@@ -120,12 +120,12 @@ exports.findAll = async (req, res, next) => {
       raw: true,
     });
 
-    /* map HATEOAS links to each one of the Accomodations
-    Accomodations.rows.forEach(Accomodation => {
-      Accomodation.links = [
-        { rel: "self", href: `/Accomodations/${Accomodation.id}`, method: "GET" },
-        { rel: "modify", href: `/Accomodations/${Accomodation.id}`, method: "PUT" },
-        { rel: "delete", href: `/Accomodations/${Accomodation.id}`, method: "DELETE" },
+    /* map HATEOAS links to each one of the accommodations
+    accommodations.rows.forEach(accommodation => {
+      accommodation.links = [
+        { rel: "self", href: `/accommodations/${accommodation.id}`, method: "GET" },
+        { rel: "modify", href: `/accommodations/${accommodation.id}`, method: "PUT" },
+        { rel: "delete", href: `/accommodations/${accommodation.id}`, method: "DELETE" },
       ]
     });
     */
@@ -137,7 +137,7 @@ exports.findAll = async (req, res, next) => {
     };
 
     // mapeia as acomodações e formata as datas
-    const formattedData = Accomodations.rows.map((acc) => ({
+    const formattedData = Accommodations.rows.map((acc) => ({
       ...acc,
       available_from: formatDate(acc.available_from),
       available_to: formatDate(acc.available_to),
@@ -163,7 +163,7 @@ exports.findOne = async (req, res, next) => {
   try {
     clear();
     const accommodationId = req.params.idAccommodation;
-    console.log(`AccomodationId: ${accommodationId}`);
+    console.log(`accommodationId: ${accommodationId}`);
 
     // Busca o utilizador por chave primária SEM dependência das relações
     const accommodation = await Accommodation.findByPk(accommodationId, {
@@ -183,7 +183,7 @@ exports.findOne = async (req, res, next) => {
       */
     });
 
-    // Se não encontrar o Accomodation, lança erro 404
+    // Se não encontrar o accommodation, lança erro 404
     if (!accommodation) {
       throw new ErrorHandler(
         404,
@@ -198,12 +198,12 @@ exports.findOne = async (req, res, next) => {
       links: [
         {
           rel: "modify",
-          href: `/Accomodations/${accommodation.id}`,
+          href: `/accommodations/${accommodation.id}`,
           method: "PUT",
         },
         {
           rel: "delete",
-          href: `/Accomodations/${accommodation.id}`,
+          href: `/accommodations/${accommodation.id}`,
           method: "DELETE",
         },
       ],
@@ -282,12 +282,12 @@ exports.create = async (req, res, next) => {
       links: [
         {
           rel: "modify",
-          href: `/accomodations/${newAccommodation.id}`,
+          href: `/accommodations/${newAccommodation.id}`,
           method: "PUT",
         },
         {
           rel: "delete",
-          href: `/accomodations/${newAccommodation.id}`,
+          href: `/accommodations/${newAccommodation.id}`,
           method: "DELETE",
         },
       ],
@@ -333,15 +333,12 @@ exports.update = async (req, res, next) => {
 
     // Atualiza os campos da acomodação com os dados do corpo da requisição
     accommodation.title = req.body.title || accommodation.title;
-    accommodation.description =
-      req.body.description || accommodation.description;
+    accommodation.description = req.body.description || accommodation.description;
     accommodation.location = req.body.location || accommodation.location;
     accommodation.room_type = req.body.room_type || accommodation.room_type;
     accommodation.bed_count = req.body.bed_count || accommodation.bed_count;
-    accommodation.price_per_night =
-      req.body.price_per_night || accommodation.price_per_night;
-    accommodation.available_from =
-      req.body.startDate || accommodation.available_from;
+    accommodation.price_per_night = req.body.price_per_night || accommodation.price_per_night;
+    accommodation.available_from = req.body.startDate || accommodation.available_from;
     accommodation.available_to = req.body.endDate || accommodation.available_to;
 
     // Salva as alterações na base de dados
