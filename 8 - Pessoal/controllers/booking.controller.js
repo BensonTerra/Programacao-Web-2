@@ -9,7 +9,7 @@ const AccommodationBooking = db.accommodationBooking;
 const EventBooking = db.eventBooking;
 const Accommodation = db.accommodation;
 const Event = db.event;
-let novaReserva = {};
+
 
 //necessary for LIKE operator
 const { Op, ValidationError, and } = require("sequelize");
@@ -18,18 +18,23 @@ const clear = require("clear");
 exports.create = async (req, res) => {
   try {
     clear();
+    let novaReserva = {};
     const userId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation ? parseInt(req.params.idAccommodation) : null;
     const eventId = req.params.idEvent ? parseInt(req.params.idEvent) : null;
 
     //console.log(userId, accommodationId, eventId);
 
-    const { DataInicio, DataFim, NumPessoas } = req.body;
+    const { 
+      from, 
+      to, 
+      numPeople 
+    } = req.body;
 
     // Se for reserva de alojamento, validar campos obrigatórios
     if (accommodationId && accommodationId != 0) {
       if (accommodationId) {
-        if (!DataInicio || !DataFim || !NumPessoas) {
+        if (!from || !to || !numPeople) {
           return res.status(400).json({
             errorMessage:
               "Campos obrigatórios em falta para reserva de alojamento: DataInicio, DataFim, NumPessoas.",
@@ -47,7 +52,7 @@ exports.create = async (req, res) => {
           where: {
             userId,
             accommodationId,
-            estado: "pendente",
+            status: "pendente",
           },
         });
 
@@ -64,11 +69,11 @@ exports.create = async (req, res) => {
       novaReserva = await AccommodationBooking.create({
         userId,
         accommodationId,
-        data_inicio: DataInicio,
-        data_fim: DataFim,
-        num_pessoas: NumPessoas,
-        estado: "pendente",
-        comentario: null,
+        from: from,
+        to: to,
+        numPeople: numPeople,
+        status: "pendente",
+        commentary: null,
       });
     }
 

@@ -227,7 +227,7 @@ exports.findAllMyEvents = async (req, res, next) => {
       links: [
         {
           rel: "self",
-          href: `/accommodations/myEvents`,
+          href: `/events/myEvents`,
           method: "GET",
         },
       ],

@@ -65,8 +65,8 @@ db.event.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
 (async () => {
     try {;
         //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
-        //await sequelize.sync();
+        //await sequelize.sync({ alter: true });
+        await sequelize.sync();
 
         clear()
         console.log('DB is successfully synchronized');

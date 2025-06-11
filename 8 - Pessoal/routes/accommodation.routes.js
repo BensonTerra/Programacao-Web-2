@@ -1,48 +1,59 @@
 const express = require('express');
 const authController = require("../controllers/auth.controller");
 const accommodationsController = require("../controllers/accommodations.controller");
-const bookingsController = require("../controllers/booking.controller");  // controlador das reservas
-//const accommodationBooking = require('../models');
+const bookingsController = require("../controllers/booking.controller");
 
-// express router
-let router = express.Router();
+const router = express.Router();
 
 /*--------------------------------------------------------------------------------------------------------------*/
-/*                                         Area pública do utilizador                                           */
+/*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
 /*--------------------------------------------------------------------------------------------------------------*/
-router.route('/')
-    .get(accommodationsController.findAll)
 
-router.route('/:idAccommodation')
-    .get(accommodationsController.findOne)
-
-router.route('/:idAccommodation/booking')
-    .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create);
-/*--------------------------------------------------------------------------------------------------------------*/
-/*                                         Area privada do admistrador e facilitador                            */
-/*--------------------------------------------------------------------------------------------------------------*/
+// Listar ou criar minhas acomodações
 router.route('/myAccommodations')
-    .get(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.findAllMyAccommodations)
-    .post(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.create)
+  .get(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.findAllMyAccommodations)
+  .post(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.create);
 
+// Ver, atualizar ou deletar uma das minhas acomodações
 router.route('/myAccommodations/:idAccommodation')
-    .get(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.findOne)
-    .patch(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.update)
-    .delete(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.delete);
+  .get(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.findOneAccommodation)
+  .patch(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.update)
+  .delete(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.delete);
 
+// Ver todas as reservas de uma acomodação minha
 router.route('/myAccommodations/:idAccommodation/bookings')
-    .get(authController.verifyToken, authController.isAdminFacilitador, bookingsController.findAll)
-    //valido uma reserva de alojamento
+  .get(authController.verifyToken, authController.isAdminFacilitador, bookingsController.findAll);
 
+// Validar uma reserva específica de uma acomodação minha
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
-    .get(authController.verifyToken, authController.isAdminFacilitador, bookingsController.validateAccommodationBooking)
+  .get(authController.verifyToken, authController.isAdminFacilitador, bookingsController.validateAccommodationBooking);
 
-    //valido uma reserva de alojamento
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                                   ÁREA PÚBLICA DO UTILIZADOR (sem login)                                     */
+/*--------------------------------------------------------------------------------------------------------------*/
 
+// Listar todas as acomodações públicas
+router.route('/')
+  .get(accommodationsController.findAllAccommodations);
 
-router.all('*', function (req, res) {
-    //send an predefined error message 
-    res.status(400).json({ success: false, message:`The API does not recognize the request on ${req.method} ${req.url}` });
-})
+// Detalhes de uma acomodação pública por ID
+router.route('/:idAccommodation')
+  .get(accommodationsController.findOneAccommodation);
+
+// Criar reserva pública para uma acomodação (requer login e permissão)
+router.route('/:idAccommodation/booking')
+  .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create);
+
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                                         TRATAMENTO DE ROTA INVÁLIDA                                          */
+/*--------------------------------------------------------------------------------------------------------------*/
+
+// Qualquer outra rota não reconhecida
+router.all('*', (req, res) => {
+  res.status(400).json({
+    success: false,
+    message: `The API does not recognize the request on ${req.method} ${req.url}`,
+  });
+});
 
 module.exports = router;

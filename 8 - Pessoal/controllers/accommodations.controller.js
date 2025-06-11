@@ -12,7 +12,7 @@ const User = db.user;
 const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
-exports.findAll = async (req, res, next) => {
+exports.findAllAccommodations = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
   let {
@@ -20,7 +20,7 @@ exports.findAll = async (req, res, next) => {
     title,
     location,
     room_type,
-    bed_count,
+    bedCount,
     price_per_night,
     start_date,
     end_date,
@@ -45,12 +45,17 @@ exports.findAll = async (req, res, next) => {
   // search by title require to build a query with the operator L
   const condition = {
     ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
+    ...(location ? { location: { [Op.like]: `%${location}%` } } : {}),
+    ...(room_type ? { room_type: { [Op.like]: `%${room_type}%` } } : {}),
+    ...(bedCount ? { bed_count: bedCount } : {}),
+    ...(price_per_night ? { price_per_night: price_per_night } : {}),
   };
+
   //console.log(condition);
 
   if (start_date && end_date) {
-    const startDate = new Date(start_date);
-    const endDate = new Date(end_date);
+    const startDate = new Date(start_date); console.log(`startDate ${startDate}`);
+    const endDate = new Date(end_date); console.log(`endDate ${endDate}`);
 
     // Verifica se a acomodação está disponível no período
     condition.available_from = { [Op.lte]: startDate };
@@ -62,20 +67,20 @@ exports.findAll = async (req, res, next) => {
       where: {
         [Op.or]: [
           {
-            data_inicio: {
+            from: {
               [Op.between]: [startDate, endDate],
             },
           },
           {
-            data_fim: {
+            to: {
               [Op.between]: [startDate, endDate],
             },
           },
           {
-            data_inicio: {
+            from: {
               [Op.lte]: startDate,
             },
-            data_fim: {
+            to: {
               [Op.gte]: endDate,
             },
           },
@@ -159,7 +164,7 @@ exports.findAll = async (req, res, next) => {
   }
 };
 
-exports.findOne = async (req, res, next) => {
+exports.findOneAccommodation = async (req, res, next) => {
   try {
     clear();
     const accommodationId = req.params.idAccommodation;
@@ -216,13 +221,13 @@ exports.findOne = async (req, res, next) => {
 exports.findAllMyAccommodations = async (req, res, next) => {
   try {
     clear();
-    const userId = req.loggedUserId; //console.log(`UserId: ${userId}`);
+    const userId = req.loggedUserId; console.log(`UserId: ${userId}`);
 
     // Busca todas as acomodações criadas pelo utilizador autenticado
     let Accommodations = await Accommodation.findAndCountAll({
       where: { createdByUserId: userId },
       raw: true,
-    }); //console.log(`Accommodations: ${Accommodations}`);
+    }); console.log(`Accommodations: ${Accommodations}`);
 
     // Se não encontrar acomodações, lança erro 404
     if (!Accommodations || Accommodations.length === 0) {
@@ -332,12 +337,15 @@ exports.update = async (req, res, next) => {
 
     // Atualiza os campos da acomodação com os dados do corpo da requisição
     accommodation.title = req.body.title || accommodation.title;
-    accommodation.description = req.body.description || accommodation.description;
+    accommodation.description =
+      req.body.description || accommodation.description;
     accommodation.location = req.body.location || accommodation.location;
     accommodation.room_type = req.body.room_type || accommodation.room_type;
     accommodation.bed_count = req.body.bed_count || accommodation.bed_count;
-    accommodation.price_per_night = req.body.price_per_night || accommodation.price_per_night;
-    accommodation.available_from = req.body.startDate || accommodation.available_from;
+    accommodation.price_per_night =
+      req.body.price_per_night || accommodation.price_per_night;
+    accommodation.available_from =
+      req.body.startDate || accommodation.available_from;
     accommodation.available_to = req.body.endDate || accommodation.available_to;
 
     // Salva as alterações na base de dados
