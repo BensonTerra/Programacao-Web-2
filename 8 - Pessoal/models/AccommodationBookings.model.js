@@ -2,7 +2,6 @@ const Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('accommodationBookings', {
-    // Chaves primárias e estrangeiras
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -18,36 +17,40 @@ module.exports = function (sequelize, DataTypes) {
     },
     accommodationId: {
       type: DataTypes.INTEGER,
-      allowNull: true, 
+      allowNull: true,
       references: {
         model: 'Accommodations',
         key: 'id',
       },
       defaultValue: null,
     },
-
-    data_inicio: {
+    from: {
       type: DataTypes.DATEONLY,
       allowNull: true,
       defaultValue: null,
     },
-    data_fim: {
+    to: {
       type: DataTypes.DATEONLY,
       allowNull: true,
       defaultValue: null,
     },
-    num_pessoas: {
+    numPeople: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null,
     },
-
-    estado: {
+    status: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'pendente',
+      validate: {
+        isIn: {
+          args: [['pendente', 'aceita', 'recusada']],
+          msg: 'Status must be one of: pendente, aceita, recusada',
+        },
+      },
     },
-    comentario: {
+    commentary: {
       type: DataTypes.STRING,
       allowNull: true,
       defaultValue: '',
@@ -56,4 +59,3 @@ module.exports = function (sequelize, DataTypes) {
     timestamps: false,
   });
 };
-

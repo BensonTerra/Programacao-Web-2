@@ -119,3 +119,87 @@ exports.create = async (req, res) => {
     });
   }
 };
+
+exports.findAll = async (req, res) => {
+  try {
+    clear();
+    const userId = req.loggedUserId; 
+    //console.log("UserId:", userId);
+
+    let accommodationId = req.params.idAccommodation;
+    //console.log("AccommodationId:", accommodationId);
+
+    let accommodation = await Accommodation.findByPk(accommodationId); 
+    //console.log("Accommodation:", accommodation);
+
+    let accommodationBookings = await AccommodationBooking.findAndCountAll({
+      where: {
+        accommodationId: accommodationId,
+      },
+      order: [["from", "DESC"]],
+    }); //console.log("AccommodationBookings:", accommodationBookings);
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings retrieved successfully.",
+      dados: accommodationBookings.rows,
+    });
+    
+  } catch (error) {
+    console.error("Erro ao buscar reservas:", error);
+    return res.status(500).json({
+      errorMessage: "Erro interno ao buscar reservas.",
+      error: error.message,
+    });
+  }
+};
+
+exports.validateAccommodationBooking = async (req, res, next) => {
+  try {
+    clear();
+    const loggedUserId = req.loggedUserId; 
+    //console.log("LoggedUserId:", loggedUserId);
+    const accommodationId = req.params.idAccommodation; 
+    //console.log("accommodationId:", accommodationId);
+    const accommodationBookingId = req.params.idAccommodationBooking; 
+    //console.log("accommodationBookingId:", accommodationBookingId);
+
+    // Busca o alojamento associado à reserva
+    const accommodation = await Accommodation.findByPk(accommodationId); 
+    //console.log("Accommodation:", accommodation);
+    
+    // Verifica se o utilizador autenticado é o dono do alojamento
+    if (accommodation.createdByUserId !== loggedUserId) {
+      throw new ErrorHandler(403, `You are not allowed to validate this booking.`);
+    }
+
+    if (!accommodation) {
+      throw new ErrorHandler(404, `Accommodation not found for this booking.`);
+    }
+
+    // Busca a reserva
+    const accommodationBooking = await AccommodationBooking.findByPk(accommodationBookingId); 
+    console.log("AccommodationBooking:", accommodationBooking);
+
+    if (!accommodationBooking) {
+      throw new ErrorHandler(404, `No booking found with ID ${accommodationBookingId}.`);
+    }
+
+    accommodationBooking.status = req.body.status || accommodationBooking.status;
+    accommodationBooking.commentary = req.body.commentary || accommodationBooking.commentary
+    accommodationBooking.from = accommodationBooking.from
+    accommodationBooking.to = accommodationBooking.to
+
+    console.log("Updated Booking:", accommodationBooking);
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking validated successfully.",
+      // dados: ..., 
+    });
+
+  } catch (error) {
+    console.error("Error validating booking:", error);
+    next(error); // encaminha para middleware de erro central
+  }
+};

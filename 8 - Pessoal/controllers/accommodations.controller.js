@@ -272,8 +272,8 @@ exports.create = async (req, res, next) => {
       bed_count: req.body.bed_count,
       price_per_night: req.body.price_per_night,
       rating: null,
-      available_from: req.body.startDate,
-      available_to: req.body.endDate,
+      available_from: req.body.available_from,
+      available_to: req.body.available_to,
     });
 
     return res.status(200).json({
@@ -302,7 +302,6 @@ exports.create = async (req, res, next) => {
   }
 };
 
-/*patch*/
 exports.update = async (req, res, next) => {
   try {
     clear();
@@ -365,7 +364,6 @@ exports.update = async (req, res, next) => {
   }
 };
 
-/*delete*/
 exports.delete = async (req, res, next) => {
   try {
     clear();
