@@ -241,7 +241,8 @@ exports.findAllMyEvents = async (req, res, next) => {
 exports.create = async (req, res, next) => {
   try {
     clear();
-
+    console.log(req.body);
+    
     let newEvent = await Event.create({
       createdByUserId: req.loggedUserId,
       title: req.body.title,

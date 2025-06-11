@@ -51,16 +51,22 @@ db.eventBooking.belongsTo(db.event, { foreignKey: 'eventId', as: 'event' });
 db.user.belongsToMany(db.event, { through: 'UserEventInterest', foreignKey: 'userId', otherKey: 'eventId' });
 db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eventId', otherKey: 'userId' });
 
-// ASSOCIAÇÃO: User → Accommodations
+// ASSOCIAÇÃO: User → Accommodations (criador do alojamento)
 db.user.hasMany(db.accommodation, { foreignKey: 'createdByUserId', as: 'accommodations' });
 db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
+
+// ASSOCIAÇÃO: User → Events (criador do evento)
+db.user.hasMany(db.event, { foreignKey: 'createdByUserId', as: 'createdEvents' });
+db.event.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
+
+
 
 // Optionally: SYNC
 (async () => {
     try {;
         //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
-        //await sequelize.sync();
+        //await sequelize.sync({ alter: true });
+        await sequelize.sync();
 
         clear()
         console.log('DB is successfully synchronized');

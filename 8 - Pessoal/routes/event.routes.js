@@ -20,7 +20,7 @@ router.route('/:idEvent')
     .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
 
 
-router.route('/:idEvent/reserva')
+router.route('/:idEvent/booking')
     .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create)
     .patch(authController.verifyToken, authController.isAdminFacilitador, eventsController.update)
     .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
