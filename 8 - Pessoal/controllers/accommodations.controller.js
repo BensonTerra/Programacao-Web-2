@@ -310,17 +310,12 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     clear();
+    
+    const loggedUserId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation;
-    //console.log(`AccommodationId: ${accommodationId}`);
 
-    // Busca a acomodação por chave primária
     const accommodation = await Accommodation.findByPk(accommodationId);
 
-    //Obter user logado para garantir que o utilizador autenticado é o dono da acomodação
-    const loggedUserId = req.loggedUserId;
-    //console.log(`Logged UserId: ${loggedUserId}`);
-
-    // Se não encontrar a acomodação, lança erro 404
     if (!accommodation) {
       throw new ErrorHandler(
         404,
@@ -337,15 +332,12 @@ exports.update = async (req, res, next) => {
 
     // Atualiza os campos da acomodação com os dados do corpo da requisição
     accommodation.title = req.body.title || accommodation.title;
-    accommodation.description =
-      req.body.description || accommodation.description;
+    accommodation.description = req.body.description || accommodation.description;
     accommodation.location = req.body.location || accommodation.location;
     accommodation.room_type = req.body.room_type || accommodation.room_type;
     accommodation.bed_count = req.body.bed_count || accommodation.bed_count;
-    accommodation.price_per_night =
-      req.body.price_per_night || accommodation.price_per_night;
-    accommodation.available_from =
-      req.body.startDate || accommodation.available_from;
+    accommodation.price_per_night = req.body.price_per_night || accommodation.price_per_night;
+    accommodation.available_from = req.body.startDate || accommodation.available_from;
     accommodation.available_to = req.body.endDate || accommodation.available_to;
 
     // Salva as alterações na base de dados

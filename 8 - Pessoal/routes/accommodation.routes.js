@@ -20,7 +20,7 @@ router.route('/myAccommodations/:idAccommodation')
   .patch(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.update)
   .delete(authController.verifyToken, authController.isAdminFacilitador, accommodationsController.delete);
 
-// Ver todas as reservas de uma acomodação minha
+// Ver todas as reservas de uma das acomodações
 router.route('/myAccommodations/:idAccommodation/bookings')
   .get(authController.verifyToken, authController.isAdminFacilitador, bookingsController.findAll);
 

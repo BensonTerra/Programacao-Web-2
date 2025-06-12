@@ -10,26 +10,52 @@ const EventBooking = db.eventBooking;
 const Accommodation = db.accommodation;
 const Event = db.event;
 
-
 //necessary for LIKE operator
 const { Op, ValidationError, and } = require("sequelize");
 const clear = require("clear");
+
+exports.findAll = async (req, res) => {
+  try {
+    clear();
+    const userId = req.loggedUserId;
+    //console.log("UserId:", userId);
+
+    let accommodationId = req.params.idAccommodation;
+    //console.log("AccommodationId:", accommodationId);
+
+    let accommodation = await Accommodation.findByPk(accommodationId);
+    //console.log("Accommodation:", accommodation);
+
+    let accommodationBookings = await AccommodationBooking.findAndCountAll({
+      where: {
+        accommodationId: accommodationId,
+      },
+      order: [["from", "DESC"]],
+    }); //console.log("AccommodationBookings:", accommodationBookings);
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings retrieved successfully.",
+      dados: accommodationBookings.rows,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar reservas:", error);
+    return res.status(500).json({
+      errorMessage: "Erro interno ao buscar reservas.",
+      error: error.message,
+    });
+  }
+};
 
 exports.create = async (req, res) => {
   try {
     clear();
     let novaReserva = {};
     const userId = req.loggedUserId;
-    const accommodationId = req.params.idAccommodation ? parseInt(req.params.idAccommodation) : null;
-    const eventId = req.params.idEvent ? parseInt(req.params.idEvent) : null;
+    const accommodationId = req.params.idAccommodation;
+    const eventId = req.params.idEvent;
 
-    //console.log(userId, accommodationId, eventId);
-
-    const { 
-      from, 
-      to, 
-      numPeople 
-    } = req.body;
+    const { from, to, numPeople } = req.body;
 
     // Se for reserva de alojamento, validar campos obrigatórios
     if (accommodationId && accommodationId != 0) {
@@ -46,7 +72,7 @@ exports.create = async (req, res) => {
           return res
             .status(404)
             .json({ errorMessage: "Alojamento não encontrado." });
-        }; 
+        }
 
         const existingBooking = await AccommodationBooking.findOne({
           where: {
@@ -113,7 +139,9 @@ exports.create = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: accommodationId ? "Reserva de alojamento criada com sucesso." : "Inscrição em evento criada com sucesso.",
+      message: accommodationId
+        ? "Reserva de alojamento criada com sucesso."
+        : "Inscrição em evento criada com sucesso.",
       dados: novaReserva,
     });
   } catch (error) {
@@ -125,57 +153,89 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.findAll = async (req, res) => {
+exports.update = async (req, res, next) => {
   try {
     clear();
-    const userId = req.loggedUserId; 
-    //console.log("UserId:", userId);
 
-    let accommodationId = req.params.idAccommodation;
-    //console.log("AccommodationId:", accommodationId);
+    const accommodationId = req.params.idAccommodation;
+    const accommodationBookingId = req.params.idAccommodationBooking;
 
-    let accommodation = await Accommodation.findByPk(accommodationId); 
-    //console.log("Accommodation:", accommodation);
+    // Busca a reserva por chave primária
+    const accommodationBooking = await AccommodationBooking.findByPk(
+      accommodationBookingId
+    );
 
-    let accommodationBookings = await AccommodationBooking.findAndCountAll({
-      where: {
-        accommodationId: accommodationId,
-      },
-      order: [["from", "DESC"]],
-    }); //console.log("AccommodationBookings:", accommodationBookings);
+    //Obter user logado para garantir que o utilizador autenticado é quem efetuou a reserva
+    const loggedUserId = req.loggedUserId;
+    //console.log(`Logged UserId: ${loggedUserId}`);
+
+    // Se não encontrar a acomodação, lança erro 404
+    if (!accommodationBooking) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodationBooking with ID ${accommodationBookingId}.`
+      );
+    }
+
+    if (accommodationBooking.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this accommodationBooking.`
+      );
+    }
+
+    // Atualiza os campos da accommodationBooking com os dados do corpo da requisição
+    accommodationBooking.from = req.body.from || accommodationBooking.from;
+    accommodationBooking.to = req.body.to || accommodationBooking.to;
+    accommodationBooking.numPeople = req.body.numPeople || accommodationBooking.numPeople;
+    accommodationBooking.status = "pendente";
+    accommodationBooking.commentary = "";
+
+    // Salva as alterações na base de dados
+    await accommodationBooking.save();
 
     return res.status(200).json({
       success: true,
-      message: "Bookings retrieved successfully.",
-      dados: accommodationBookings.rows,
+      message: `AccommodationBooking with ID ${accommodationBookingId} updated successfully.`,
+      data: accommodationBooking,
+      links: [
+        {
+          rel: "self",
+          href: `/users/me/bookings/${accommodationBookingId}`,
+          method: "GET",
+        },
+        {
+          rel: "cancel",
+          href: `/users/me/bookings/${accommodationBookingId}`,
+          method: "DELETE",
+        },
+      ],
     });
-    
-  } catch (error) {
-    console.error("Erro ao buscar reservas:", error);
-    return res.status(500).json({
-      errorMessage: "Erro interno ao buscar reservas.",
-      error: error.message,
-    });
+  } catch (err) {
+    next(err);
   }
 };
 
 exports.validateAccommodationBooking = async (req, res, next) => {
   try {
     clear();
-    const loggedUserId = req.loggedUserId; 
+    const loggedUserId = req.loggedUserId;
     //console.log("LoggedUserId:", loggedUserId);
-    const accommodationId = req.params.idAccommodation; 
+    const accommodationId = req.params.idAccommodation;
     //console.log("accommodationId:", accommodationId);
-    const accommodationBookingId = req.params.idAccommodationBooking; 
+    const accommodationBookingId = req.params.idAccommodationBooking;
     //console.log("accommodationBookingId:", accommodationBookingId);
 
     // Busca o alojamento associado à reserva
-    const accommodation = await Accommodation.findByPk(accommodationId); 
+    const accommodation = await Accommodation.findByPk(accommodationId);
     //console.log("Accommodation:", accommodation);
-    
+
     // Verifica se o utilizador autenticado é o dono do alojamento
     if (accommodation.createdByUserId !== loggedUserId) {
-      throw new ErrorHandler(403, `You are not allowed to validate this booking.`);
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to validate this booking.`
+      );
     }
 
     if (!accommodation) {
@@ -183,26 +243,32 @@ exports.validateAccommodationBooking = async (req, res, next) => {
     }
 
     // Busca a reserva
-    const accommodationBooking = await AccommodationBooking.findByPk(accommodationBookingId); 
+    const accommodationBooking = await AccommodationBooking.findByPk(
+      accommodationBookingId
+    );
     console.log("AccommodationBooking:", accommodationBooking);
 
     if (!accommodationBooking) {
-      throw new ErrorHandler(404, `No booking found with ID ${accommodationBookingId}.`);
+      throw new ErrorHandler(
+        404,
+        `No booking found with ID ${accommodationBookingId}.`
+      );
     }
 
-    accommodationBooking.status = req.body.status || accommodationBooking.status;
-    accommodationBooking.commentary = req.body.commentary || accommodationBooking.commentary
-    accommodationBooking.from = accommodationBooking.from
-    accommodationBooking.to = accommodationBooking.to
+    accommodationBooking.status =
+      req.body.status || accommodationBooking.status;
+    accommodationBooking.commentary =
+      req.body.commentary || accommodationBooking.commentary;
+    accommodationBooking.from = accommodationBooking.from;
+    accommodationBooking.to = accommodationBooking.to;
 
     console.log("Updated Booking:", accommodationBooking);
 
     return res.status(200).json({
       success: true,
       message: "Booking validated successfully.",
-      // dados: ..., 
+      // dados: ...,
     });
-
   } catch (error) {
     console.error("Error validating booking:", error);
     next(error); // encaminha para middleware de erro central
