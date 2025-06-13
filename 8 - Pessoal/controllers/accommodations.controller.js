@@ -392,12 +392,7 @@ exports.delete = async (req, res, next) => {
       );
     }
 
-    accommodation.destroy({
-      where: {
-        id: accommodationId,
-        createdByUserId: loggedUserId,
-      },
-    });
+    accommodation.destroy();
 
     return res.status(200).json({
       success: true,

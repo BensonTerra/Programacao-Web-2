@@ -13,6 +13,9 @@ router.route('/')
 
 router.route('/:idUser')
     .get(authController.verifyToken, authController.isAdmin, usersController.findOneUser)
+    .patch(authController.verifyToken, authController.isAdmin, usersController.updateOneUser)
+    .delete(authController.verifyToken, authController.isAdmin, usersController.deleteOneUser)
+
 
 router.route('/login')
     .post(usersController.login)
@@ -31,8 +34,7 @@ router.route('/me/eventBookings')
 
 router.route('/me/eventBookings/:idEventBooking')
     .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyEventBooking)
-    //.patch(authController.verifyToken, authController.isAdminOrFacilitador, usersController.updateOneMyEventBooking)
-    //.delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyEventBooking)
+    .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyEventBooking)
 
 
 router.all('*', function (req, res) {

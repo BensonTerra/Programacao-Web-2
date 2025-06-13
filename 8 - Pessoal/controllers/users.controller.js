@@ -128,7 +128,7 @@ exports.findAllUsers = async (req, res, next) => {
     ...(email ? { email: { [Op.like]: `%${email}%` } } : {}),
     ...(role ? { role: { [Op.like]: `%${role}%` } } : {}),
   }; 
-  console.log(condition);
+  //console.log(condition);
 
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
     return res
@@ -194,9 +194,62 @@ exports.findOneUser = async (req, res, next) => {
   }
 };
 
-/* modifcar role perfil */
+exports.updateOneUser = async (req, res, next) => {
+  try {
+    clear();
+    const userId = req.params.idUser; //console.log(`userId: ${userId}`);
 
-/* apagar perfil */
+    // Busca o utilizador por chave primária SEM dependência das relações
+    const user = await User.findByPk(userId)
+    // Se não encontrar o user, lança erro 404
+    if (!user) {
+      throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
+    }
+
+    user.role = req.body.role || user.role;
+
+    // Retorna os dados do utilizador com links HATEOAS
+    return res.json({
+      success: true,
+      data: `User with ID ${userId} updated successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteOneUser = async (req, res, next) => {
+  try {
+    clear();
+
+    const userId = req.params.idUser; //console.log(`userId: ${userId}`);
+
+    // Impede o usuário de excluir a si mesmo
+    if (req.loggedUserId = userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'You cannot delete your own user account.',
+      });
+    }
+
+    // Busca o utilizador por chave primária SEM dependência das relações
+    const user = await User.findByPk(userId)
+    // Se não encontrar o user, lança erro 404
+    if (!user) {
+      throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
+    }
+
+    user.destroy();
+
+    // Retorna os dados do utilizador com links HATEOAS
+    return res.json({
+      success: true,
+      data: `User with ID ${userId} deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 /*---------------------------------------------------------------------*/
 /*                        accommodationBookings                        */
@@ -426,4 +479,40 @@ exports.findOneMyEventBooking = async (req, res, next) => {
   }
 }
 
-//delete
+exports.deleteOneMyEventBooking = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const eventBookingId = req.params.idAccommodationBooking;
+
+    const eventBooking = await EventBooking.findOne({
+      where: {
+        id: eventBookingId,
+        userId: loggedUserId,
+      },
+    });
+
+    if (!eventBooking) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any eventBooking with ID ${eventBookingId}.`
+      );
+    }
+
+    if (eventBooking.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to delete this eventBooking.`
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `EventBooking with ID ${eventBookingId} delete successfully.`,
+      dados: eventBooking,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
