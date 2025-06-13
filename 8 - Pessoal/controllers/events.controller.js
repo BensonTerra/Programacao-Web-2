@@ -5,7 +5,6 @@ const { JWTconfig } = require("../utils/config.js");
 const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
-
 const Event = db.event;
 const eventBooking = db.eventBooking;
 const User = db.user;
@@ -13,7 +12,7 @@ const User = db.user;
 const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
-exports.findAll = async (req, res, next) => {
+exports.findAllEvents = async (req, res, next) => {
   clear();
   //get data from request query string (if not existing, they will be undefined)
   let { 
@@ -143,29 +142,14 @@ exports.findAll = async (req, res, next) => {
   }
 };
 
-exports.findOne = async (req, res, next) => {
+exports.findOneEvent = async (req, res, next) => {
   try {
     clear();
     const eventId = req.params.idEvent;
     console.log(`EventId: ${eventId}`);
 
     // Busca o utilizador por chave primária SEM dependência das relações
-    const accommodation = await Event.findByPk(eventId, {
-      // Deixa a estrutura de include comentada para uso futuro
-      /*
-            include: [
-                {
-                    model: db.comment,
-                    attributes: ['id', 'text']
-                },
-                {
-                    model: db.tag,
-                    attributes: ['name'],
-                    through: { attributes: [] }
-                }
-            ]
-            */
-    });
+    const accommodation = await Event.findByPk(eventId, {});
 
     // Se não encontrar o Event, lança erro 404
     if (!accommodation) {

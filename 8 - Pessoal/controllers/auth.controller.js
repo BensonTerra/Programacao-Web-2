@@ -37,6 +37,17 @@ exports.verifyToken = (req, res, next) => {
     }
 };
 
+exports.hello = async (req, res, next) => {
+   console.log("Hello")
+        return next();
+
+   
+};
+
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                               Verficar role do usuario logado                                                */
+/*--------------------------------------------------------------------------------------------------------------*/
+
 exports.isAdmin = async (req, res, next) => {
     if (req.loggedUserRole === "admin")
         return next();
@@ -65,6 +76,9 @@ exports.isAdminOrLoggedUser = async (req, res, next) => {
     next(new ErrorHandler(403, "This request requires an ADMIN Role or you can only see you own data!"));
 };
 
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                               Alterar role do usuario                                                        */
+/*--------------------------------------------------------------------------------------------------------------*/
 //configurar para o patch do admin
 exports.changeRoleToAdmin = async (req, res, next) => {
     try {

@@ -6,10 +6,10 @@ const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
 const User = db.user;
-const AccommodationBooking = db.accommodationBooking;
-const EventBooking = db.eventBooking;
 const Accommodation = db.accommodation;
+const AccommodationBooking = db.accommodationBooking;
 const Event = db.event;
+const EventBooking = db.eventBooking;
 
 //necessary for LIKE operator
 const { Op, ValidationError, where } = require("sequelize");
@@ -62,8 +62,9 @@ exports.create = async (req, res, next) => {
   }
 };
 
-//patch
-//delete
+// patch modifcar perfil
+
+// delete apagara perfil
 
 exports.login = async (req, res, next) => {
   try {
@@ -109,7 +110,7 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.findAll = async (req, res, next) => {
+exports.findAllUsers = async (req, res, next) => {
   clear();
   
   let {
@@ -165,29 +166,13 @@ exports.findAll = async (req, res, next) => {
   }
 };
 
-exports.findOne = async (req, res, next) => {
+exports.findOneUser = async (req, res, next) => {
   try {
     clear();
     const userId = req.params.idUser; //console.log(`userId: ${userId}`);
 
     // Busca o utilizador por chave primária SEM dependência das relações
-    const user = await User.findByPk(userId, {
-      // Deixa a estrutura de include comentada para uso futuro
-      /*
-            include: [
-                {
-                    model: db.comment,
-                    attributes: ['id', 'text']
-                },
-                {
-                    model: db.tag,
-                    attributes: ['name'],
-                    through: { attributes: [] }
-                }
-            ]
-            */
-    });
-
+    const user = await User.findByPk(userId)
     // Se não encontrar o user, lança erro 404
     if (!user) {
       throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
@@ -207,10 +192,14 @@ exports.findOne = async (req, res, next) => {
   }
 };
 
+/*---------------------------------------------------------------------*/
+/*                        accommodationBookings                        */
+/*---------------------------------------------------------------------*/
+
 exports.findAllMyAccommodationBookings = async (req, res, next) => {
   clear();
-
-  const loggedUserId = req.loggedUserId;
+  
+  const loggedUserId = req.loggedUserId; console.log(loggedUserId);  
 
   let accommodationBookings = await AccommodationBooking.findAndCountAll({
     where: {
@@ -221,12 +210,12 @@ exports.findAllMyAccommodationBookings = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "Bookings retrieved successfully.",
+    message: "AccommodationBookings retrieved successfully.",
     dados: accommodationBookings.rows,
   });
 };
 
-exports.findOneMyAccommodationBookings = async (req, res, next) => {
+exports.findOneMyAccommodationBooking = async (req, res, next) => {
   try {
     clear();
 
@@ -264,7 +253,7 @@ exports.findOneMyAccommodationBookings = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateOneMyAccommodationBooking = async (req, res, next) => {
   try {
     clear();
 
@@ -311,7 +300,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
   try {
     clear();
 
@@ -354,3 +343,79 @@ exports.delete = async (req, res, next) => {
     next(err);
   }
 };
+
+/*---------------------------------------------------------------------*/
+/*                            eventBookings                            */
+/*---------------------------------------------------------------------*/
+
+exports.findAllMyEventBookings = async (req, res, next) => {
+  clear();
+
+  const loggedUserId = req.loggedUserId;
+
+  try {
+    let eventBookings = await EventBooking.findAndCountAll({
+      where: {
+        userId: loggedUserId,
+      },
+      include: [
+        {
+          model: Event,
+          as: 'event',
+          attributes: ['id', 'title', 'available_from'],
+        },
+      ],
+      order: [
+        [
+          { model: Event, as: 'event' }, 'available_from', 'DESC'
+        ]
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "EventBookings retrieved successfully.",
+      dados: eventBookings.rows,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.findOneMyEventBooking = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const eventBookingId = req.params.idAccommodationBooking;
+
+    const eventBooking = await EventBooking.findOne({
+      where: {
+        id: eventBookingId,
+        userId: loggedUserId,
+      },
+    });
+
+    if (!eventBooking) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any eventBooking with ID ${eventBookingId}.`
+      );
+    }
+
+    if (eventBooking.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this eventBooking.`
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "EventBookings retrieved successfully.",
+      dados: eventBooking,
+    });
+  } catch (err) {
+    next(err);
+  }
+}

@@ -26,7 +26,7 @@ router.route('/myAccommodations/:idAccommodation/bookings')
 
 // Validar uma reserva específica de uma acomodação minha
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
-  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */
