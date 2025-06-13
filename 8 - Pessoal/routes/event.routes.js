@@ -5,7 +5,7 @@ const bookingsController = require("../controllers/booking.controller");
 
 // express router
 let router = express.Router();
-
+/*
 router.route('/')
     .get(eventsController.findAll)
     .post(authController.verifyToken, authController.isAdminFacilitador, eventsController.create);
@@ -24,6 +24,7 @@ router.route('/:idEvent/booking')
     .post(authController.verifyToken, authController.isAdminFacilitador, bookingsController.create)
     .patch(authController.verifyToken, authController.isAdminFacilitador, eventsController.update)
     .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
+*/
 
 router.all('*', function (req, res) {
     //send an predefined error message 

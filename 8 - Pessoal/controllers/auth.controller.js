@@ -36,18 +36,26 @@ exports.verifyToken = (req, res, next) => {
         return next(err)
     }
 };
-exports.isAdminFacilitador = async (req, res, next) => {
-    if (req.loggedUserRole === "facilitador")
-        return next();
 
-    next(new ErrorHandler(403, "This request requires facilitador role!"))
-};
-
-exports.isAdminFacilitador = async (req, res, next) => {
-    if (req.loggedUserRole === "admin" || req.loggedUserRole === "facilitador")
+exports.isAdmin = async (req, res, next) => {
+    if (req.loggedUserRole === "admin")
         return next();
 
     next(new ErrorHandler(403, "This request requires ADMIN role!"))
+};
+
+exports.isFacilitador = async (req, res, next) => {
+    if (req.loggedUserRole === "facilitador")
+        return next();
+
+    next(new ErrorHandler(403, "This request requires FACILITADOR role!"))
+};
+
+exports.isAdminOrFacilitador = async (req, res, next) => {
+    if (req.loggedUserRole === "admin" || req.loggedUserRole === "facilitador")
+        return next();
+
+    next(new ErrorHandler(403, "This request requires ADMIN or FACILITADOR role!"))
 };
 
 exports.isAdminOrLoggedUser = async (req, res, next) => {
@@ -57,6 +65,7 @@ exports.isAdminOrLoggedUser = async (req, res, next) => {
     next(new ErrorHandler(403, "This request requires an ADMIN Role or you can only see you own data!"));
 };
 
+//configurar para o patch do admin
 exports.changeRoleToAdmin = async (req, res, next) => {
     try {
         // Apenas administradores podem promover outros usuários
@@ -81,4 +90,3 @@ exports.changeRoleToAdmin = async (req, res, next) => {
         next(err);
     }
 };
-

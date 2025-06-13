@@ -6,15 +6,14 @@ const usersController = require("../controllers/users.controller");
 let router = express.Router();
 
 router.route('/')
-    .get(authController.verifyToken, authController.isAdminFacilitador, usersController.findAll)
+    .get(authController.verifyToken, authController.isAdmin, usersController.findAll)
     .post(usersController.create)
 
 router.route('/:idUser')
-    .get(usersController.findOne)
+    .get(authController.verifyToken, authController.isAdmin, usersController.findOne)
 
 router.route('/login')
     .post(usersController.login)
-
 
 router.route('/me/accommodationBookings') 
     .get(authController.verifyToken, usersController.findAllMyAccommodationBookings);
@@ -24,8 +23,10 @@ router.route('/me/accommodationBookings/:idAccommodationBooking')
     .patch(authController.verifyToken, usersController.update)
     .delete(authController.verifyToken, usersController.delete)
 /*
-router.route('/me/events') 
-    .get(authController.verifyToken, userController.getMyEvents);
+router.route('/me/accommodationBookings/:idAccommodationBooking')
+    .get(authController.verifyToken, usersController.findOneMyAccommodationBookings)
+    .patch(authController.verifyToken, usersController.update)
+    .delete(authController.verifyToken, usersController.delete)
 */
 
 router.all('*', function (req, res) {
