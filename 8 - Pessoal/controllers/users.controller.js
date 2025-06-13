@@ -6,7 +6,7 @@ const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
 const User = db.user;
-const Accommodation = db.accommodation;
+const Accommodation = db.accommodation; //usar para identificar a acomodação referente a reserva
 const AccommodationBooking = db.accommodationBooking;
 const Event = db.event;
 const EventBooking = db.eventBooking;
@@ -15,6 +15,9 @@ const EventBooking = db.eventBooking;
 const { Op, ValidationError, where } = require("sequelize");
 const clear = require("clear");
 
+/*---------------------------------------------------------------------*/
+/*                        Admin/Facilitador/Estudante                  */
+/*---------------------------------------------------------------------*/
 exports.create = async (req, res, next) => {
   try {
     clear();
@@ -62,10 +65,6 @@ exports.create = async (req, res, next) => {
   }
 };
 
-// patch modifcar perfil
-
-// delete apagara perfil
-
 exports.login = async (req, res, next) => {
   try {
     clear();
@@ -110,6 +109,9 @@ exports.login = async (req, res, next) => {
   }
 };
 
+/*---------------------------------------------------------------------*/
+/*                               Admin                                 */
+/*---------------------------------------------------------------------*/
 exports.findAllUsers = async (req, res, next) => {
   clear();
   
@@ -191,6 +193,10 @@ exports.findOneUser = async (req, res, next) => {
     next(err);
   }
 };
+
+/* modifcar role perfil */
+
+/* apagar perfil */
 
 /*---------------------------------------------------------------------*/
 /*                        accommodationBookings                        */
@@ -419,3 +425,5 @@ exports.findOneMyEventBooking = async (req, res, next) => {
     next(err);
   }
 }
+
+//delete
