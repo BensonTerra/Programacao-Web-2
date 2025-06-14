@@ -48,6 +48,41 @@ exports.findAllAccommodationBookings = async (req, res) => {
   }
 };
 
+exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
+  try {
+    clear();
+
+    const accommodationId = req.params.idAccommodation;
+
+    const accommodationBooking = await EventBooking.findByPk(accommodationId);
+
+    const loggedUserId = req.loggedUserId;
+
+    if (!accommodationBooking) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any eventBooking with ID ${accommodationId}.`
+      );
+    }
+
+    if (accommodationBooking.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to delete this eventBooking.`
+      );
+    }
+
+    accommodationBooking.destroy();
+
+    return res.status(200).json({
+      success: true,
+      data: `EventBooking with ID ${accommodationId} deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.findAllEventBookings = async (req, res) => {
   try {
     clear();
@@ -77,6 +112,43 @@ exports.findAllEventBookings = async (req, res) => {
     next(err);
   }
 };
+
+exports.deleteOneMyEventBooking = async (req, res, next) => {
+  try {
+    clear();
+
+    const eventId = req.params.idEvent;
+
+    const eventBooking = await EventBooking.findByPk(eventId);
+
+    const loggedUserId = req.loggedUserId;
+
+    if (!eventBooking) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any eventBooking with ID ${eventId}.`
+      );
+    }
+
+    if (eventBooking.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to delete this eventBooking.`
+      );
+    }
+
+    eventBooking.destroy();
+
+    return res.status(200).json({
+      success: true,
+      data: `EventBooking with ID ${eventId} deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 
 exports.createOneBooking = async (req, res) => {
   try {
@@ -230,6 +302,8 @@ exports.updateOneAccommodationBooking = async (req, res, next) => {
     next(err);
   }
 };
+
+
 
 exports.validateAccommodationBooking = async (req, res, next) => {
   try {

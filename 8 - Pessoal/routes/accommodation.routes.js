@@ -6,6 +6,13 @@ const bookingsController = require("../controllers/booking.controller");
 const router = express.Router();
 
 /*--------------------------------------------------------------------------------------------------------------*/
+/*                                         ÁREA PRIVADA (Administrador)                                         */
+/*--------------------------------------------------------------------------------------------------------------*/
+
+router.route('/:idAccommodation')
+  .delete(authController.verifyToken, authController.isAdmin, accommodationsController.deleteOneMyAccommodation)
+
+/*--------------------------------------------------------------------------------------------------------------*/
 /*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
 /*--------------------------------------------------------------------------------------------------------------*/
 
@@ -17,9 +24,13 @@ router.route('/myAccommodations/:idAccommodation')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findOneAccommodation)
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.updateOneMyAccommodation)
   .delete(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.deleteOneMyAccommodation);
+    
+router.route('/myAccommodations/:idAccommodation/rating') //Criar no postman
+  .get(authController.verifyToken,authController.isAdminOrFacilitador, accommodationsController.findAllAccommodationRatings) 
 
 router.route('/myAccommodations/:idAccommodation/bookings')
-  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings);
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
 
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
@@ -28,15 +39,18 @@ router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBookin
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */
 /*--------------------------------------------------------------------------------------------------------------*/
 
-// Listar todas as acomodações públicas
 router.route('/')
   .get(accommodationsController.findAllAccommodations);
 
-// Detalhes de uma acomodação pública por ID
 router.route('/:idAccommodation')
   .get(accommodationsController.findOneAccommodation);
+  
+router.route('/:idAccommodation/rating')
+  .get(authController.verifyToken, accommodationsController.findAllAccommodationRatings) 
+  .post(authController.verifyToken, accommodationsController.createOneAccommodationRating)
+  .patch(authController.verifyToken, accommodationsController.updateOneAccommodationRating)
+  .delete(authController.verifyToken, accommodationsController.deleteOneAccommodationRating);
 
-// Criar reserva pública para uma acomodação (requer login e permissão)
 router.route('/:idAccommodation/booking')
   .post(authController.verifyToken, bookingsController.createOneBooking);
 

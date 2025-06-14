@@ -6,6 +6,13 @@ const bookingsController = require("../controllers/booking.controller");
 const router = express.Router();
 
 /*--------------------------------------------------------------------------------------------------------------*/
+/*                                         ÁREA PRIVADA (Administrador)                                         */
+/*--------------------------------------------------------------------------------------------------------------*/
+
+router.route('/:idEvent')
+  .delete(authController.verifyToken, authController.isAdmin, eventsController.deleteOneMyEvent)
+
+/*--------------------------------------------------------------------------------------------------------------*/
 /*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
 /*--------------------------------------------------------------------------------------------------------------*/
 
@@ -19,8 +26,8 @@ router.route('myEvents/:idEvent')
   .delete(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.deleteOneMyEvent);
 
 router.route('/myEvents/:idEvent/bookings')
-  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllEventBookings);
-  //DELETE
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllEventBookings)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyEventBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */

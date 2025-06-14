@@ -15,7 +15,7 @@ router.route('/')
 
 router.route('/:idUser')
   .get(authController.verifyToken, authController.isAdmin, usersController.findOneUser)
-  .patch(authController.verifyToken, authController.isAdmin, usersController.updateOneUser) //modifcar cargo
+  .patch(authController.verifyToken, authController.isAdmin, usersController.updateOneUser)
   .delete(authController.verifyToken, authController.isAdmin, usersController.deleteOneUser);
 
 /*--------------------------------------------------------------------------------------------------------------*/
@@ -42,6 +42,9 @@ router.route('/me/eventBookings/:idEventBooking')
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                         ÁREA PÚBLICA DO UTILIZADOR                                           */
 /*--------------------------------------------------------------------------------------------------------------*/
+
+router.route('/')
+  .post(usersController.create);
 
 // Login do usuário
 router.route('/login')

@@ -10,6 +10,7 @@ const Accommodation = db.accommodation; //usar para identificar a acomodação r
 const AccommodationBooking = db.accommodationBooking;
 const Event = db.event;
 const EventBooking = db.eventBooking;
+const AccommodationRating = db.accommodationRating
 
 //necessary for LIKE operator
 const { Op, ValidationError, where } = require("sequelize");
@@ -516,3 +517,4 @@ exports.deleteOneMyEventBooking = async (req, res, next) => {
     next(err);
   }
 }
+

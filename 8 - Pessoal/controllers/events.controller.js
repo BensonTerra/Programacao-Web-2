@@ -170,7 +170,7 @@ exports.findOneEvent = async (req, res, next) => {
 };
 
 /*-------------------------------------------------------------------------------*/
-/*                                 /myAccommodations/                            */
+/*                                 /myEvents/                                    */
 /*-------------------------------------------------------------------------------*/
 
 exports.findAllMyEvents = async (req, res, next) => {

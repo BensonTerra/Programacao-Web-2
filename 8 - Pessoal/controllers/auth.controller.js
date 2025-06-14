@@ -61,32 +61,3 @@ exports.isAdminOrFacilitador = async (req, res, next) => {
 
     next(new ErrorHandler(403, "This request requires ADMIN or FACILITADOR role!"))
 };
-
-/*--------------------------------------------------------------------------------------------------------------*/
-/*                               Alterar role do usuario                                                        */
-/*--------------------------------------------------------------------------------------------------------------*/
-//configurar para o patch do admin
-exports.changeRoleToAdmin = async (req, res, next) => {
-    try {
-        // Apenas administradores podem promover outros usuários
-        if (req.loggedUserRole !== 'admin') {
-            throw new ErrorHandler(403, "Only admins can change user roles.");
-        }
-
-        const userId = req.params.userID;
-
-        const user = await User.findByPk(userId);
-        if (!user) {
-            throw new ErrorHandler(404, "User not found.");
-        }
-
-        // Atualiza o papel do usuário para 'admin'
-        user.role = 'admin';
-        await user.save();
-
-        res.status(200).json({ message: `User ${user.email} is now an admin.` });
-
-    } catch (err) {
-        next(err);
-    }
-};

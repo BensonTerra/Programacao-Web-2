@@ -7,9 +7,10 @@ const { ErrorHandler } = require("../utils/error.js");
 const db = require("../models/index.js");
 const Accommodation = db.accommodation;
 const accommodationBooking = db.accommodationBooking;
+const AccommodationRating =db.accommodationRating
 const User = db.user;
 
-const { Op, ValidationError } = require("sequelize");
+const { Sequelize, Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
 exports.findAllAccommodations = async (req, res, next) => {
@@ -54,8 +55,10 @@ exports.findAllAccommodations = async (req, res, next) => {
   //console.log(condition);
 
   if (start_date && end_date) {
-    const startDate = new Date(start_date); console.log(`startDate ${startDate}`);
-    const endDate = new Date(end_date); console.log(`endDate ${endDate}`);
+    const startDate = new Date(start_date);
+    console.log(`startDate ${startDate}`);
+    const endDate = new Date(end_date);
+    console.log(`endDate ${endDate}`);
 
     // Verifica se a acomodação está disponível no período
     condition.available_from = { [Op.lte]: startDate };
@@ -117,9 +120,21 @@ exports.findAllAccommodations = async (req, res, next) => {
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
   try {
-    let Accommodations = await Accommodation.findAndCountAll({
+    let Accommodations = await AccommodationRating.findAndCountAll({
       where: condition,
       include,
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`( 
+              SELECT AVG("rating")
+              FROM "AccommodationRatings"
+              WHERE "AccommodationRatings"."accommodationId" = "Accommodations"."id"
+            )`),
+            "rating",
+          ],
+        ],
+      },
       limit,
       offset,
       raw: true,
@@ -146,6 +161,10 @@ exports.findAllAccommodations = async (req, res, next) => {
       ...acc,
       available_from: formatDate(acc.available_from),
       available_to: formatDate(acc.available_to),
+      rating:
+        acc.rating === null
+          ? "Sem avaliações"
+          : parseFloat(acc.rating).toFixed(2),
     }));
 
     return res.status(200).json({
@@ -169,7 +188,7 @@ exports.findOneAccommodation = async (req, res, next) => {
     clear();
     const accommodationId = req.params.idAccommodation;
 
-    const accommodation = await Accommodation.findByPk(accommodationId, {
+    const accommodation = await AccommodationRating.findByPk(accommodationId, {
       // Deixa a estrutura de include comentada para uso futuro
       /*
       include: [
@@ -197,8 +216,16 @@ exports.findOneAccommodation = async (req, res, next) => {
       success: true,
       data: accommodation,
       links: [
-        { rel: "modify", href: `/accommodations/${accommodation.id}`, method: "PUT" },
-        { rel: "delete", href: `/accommodations/${accommodation.id}`, method: "DELETE" },
+        {
+          rel: "modify",
+          href: `/accommodations/${accommodation.id}`,
+          method: "PUT",
+        },
+        {
+          rel: "delete",
+          href: `/accommodations/${accommodation.id}`,
+          method: "DELETE",
+        },
       ],
     });
   } catch (err) {
@@ -210,11 +237,11 @@ exports.findOneAccommodation = async (req, res, next) => {
 /*                                 /myAccommodations/                            */
 /*-------------------------------------------------------------------------------*/
 
-
 exports.findAllMyAccommodations = async (req, res, next) => {
   try {
     clear();
-    const userId = req.loggedUserId; console.log(`UserId: ${userId}`);
+    const userId = req.loggedUserId;
+    console.log(`UserId: ${userId}`);
 
     // Busca todas as acomodações criadas pelo utilizador autenticado
     let Accommodations = await Accommodation.findAndCountAll({
@@ -291,19 +318,14 @@ exports.createOneMyAccommodation = async (req, res, next) => {
       ],
     });
   } catch (err) {
-    console.error("Erro ao criar accommodation:", err);
-    return res.status(400).json({
-      success: false,
-      msg: err.message,
-      errors: err.errors ? err.errors.map((e) => e.message) : null,
-    });
+    next(err)
   }
 };
 
 exports.updateOneMyAccommodation = async (req, res, next) => {
   try {
     clear();
-    
+
     const loggedUserId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation;
 
@@ -323,7 +345,6 @@ exports.updateOneMyAccommodation = async (req, res, next) => {
       );
     }
 
-    // Atualiza os campos da acomodação com os dados do corpo da requisição
     accommodation.title = req.body.title || accommodation.title;
     accommodation.description = req.body.description || accommodation.description;
     accommodation.location = req.body.location || accommodation.location;
@@ -333,24 +354,11 @@ exports.updateOneMyAccommodation = async (req, res, next) => {
     accommodation.available_from = req.body.startDate || accommodation.available_from;
     accommodation.available_to = req.body.endDate || accommodation.available_to;
 
-    // Salva as alterações na base de dados
     await accommodation.save();
 
     return res.status(200).json({
       success: true,
       data: `Accommodation with ID ${accommodationId} updated successfully.`,
-      links: [
-        {
-          rel: "self",
-          href: `/accommodations/${accommodation.id}`,
-          method: "GET",
-        },
-        {
-          rel: "delete",
-          href: `/accommodations/${accommodation.id}`,
-          method: "DELETE",
-        },
-      ],
     });
   } catch (err) {
     next(err);
@@ -390,6 +398,141 @@ exports.deleteOneMyAccommodation = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: `Accommodation with ID ${accommodationId} deleted successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/*---------------------------------------------------------------------*/
+/*                          accommodationRating                        */
+/*---------------------------------------------------------------------*/
+
+exports.findAllAccommodationRatings = async (req, res, next) => {
+  try {
+    clear();
+    const userId = req.loggedUserId;
+    const accommodationId = req.params.idAccommodation;
+
+    // Busca todas as acomodações criadas pelo utilizador autenticado
+    let AccommodationRatings = await AccommodationRating.findAndCountAll({
+      where: {
+        userId: userId,
+        accommodationId: accommodationId
+      },
+      raw: true,
+    });
+
+    // Se não encontrar acomodações, lança erro 404
+    if (!AccommodationRatings || AccommodationRatings.length === 0) {
+      throw new ErrorHandler(404, "No accommodationRating found for this user.");
+    }
+
+    // Retorna os dados das acomodações com links HATEOAS
+    return res.status(200).json({
+      success: true,
+      data: AccommodationRatings,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createOneAccommodationRating = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const accommodationId = req.params.idAccommodation;
+    const accommodationRating = await AccommodationRating.findByPk(accommodationId);
+
+    if (accommodationRating) {
+      throw new ErrorHandler(
+        400,
+        "You have already rated this accommodation."
+      );
+    }
+
+    let newAccommodationRating = await AccommodationRating.create({
+      userId: loggedUserId,
+      accommodationId: accommodationId,
+      rating: req.body.rating,
+      commentary:req.body.coommentary
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: newAccommodationRating,
+    });
+  } catch (err) {
+    next(err)
+  }
+};
+
+exports.updateOneAccommodationRating = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const accommodationRatingId = req.params.idAccommodation;
+    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+
+    if (!accommodationRating) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodationRating with ID ${accommodationRatingId}.`
+      );
+    }
+
+    if (accommodationRating.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this accommodationRating.`
+      );
+    }
+
+    accommodationRating.rating = req.body.rating || accommodationRating.rating;
+    accommodationRating.commentary = req.body.commentary || accommodationRating.commentary
+
+    await accommodationRating.save();
+
+    return res.status(200).json({
+      success: true,
+      data: `AccommodationRating with ID ${accommodationRatingId} updated successfully.`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteOneAccommodationRating = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const accommodationRatingId = req.params.idAccommodation;
+
+    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+
+    if (!accommodationRating) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodationRating with ID ${accommodationRatingId}.`
+      );
+    }
+
+    if (accommodationRating.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this accommodationRating.`
+      );
+    }
+
+    await accommodationRating.destroy();
+
+    return res.status(200).json({
+      success: true,
+      data: `AccommodationRating with ID ${accommodationRatingId} deleted successfully.`,
     });
   } catch (err) {
     next(err);
