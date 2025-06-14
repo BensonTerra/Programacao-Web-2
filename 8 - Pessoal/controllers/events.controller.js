@@ -146,36 +146,32 @@ exports.findOneEvent = async (req, res, next) => {
   try {
     clear();
     const eventId = req.params.idEvent;
-    console.log(`EventId: ${eventId}`);
 
-    // Busca o utilizador por chave primária SEM dependência das relações
-    const accommodation = await Event.findByPk(eventId, {});
+    const event = await Event.findByPk(eventId, {});
 
-    // Se não encontrar o Event, lança erro 404
-    if (!accommodation) {
+    if (!event) {
       throw new ErrorHandler(
         404,
-        `Cannot find any accommodation with ID ${eventId}.`
+        `Cannot find any event with ID ${eventId}.`
       );
     }
-
-    // Retorna os dados do utilizador com links HATEOAS
+    
     return res.json({
       success: true,
-      data: accommodation,
+      data: event,
       links: [
-        { rel: "modify", href: `/Events/${accommodation.id}`, method: "PUT" },
-        {
-          rel: "delete",
-          href: `/Events/${accommodation.id}`,
-          method: "DELETE",
-        },
+        { rel: "modify", href: `/Events/${event.id}`, method: "PUT" },
+        { rel: "delete", href: `/Events/${event.id}`, method: "DELETE" },
       ],
     });
   } catch (err) {
     next(err);
   }
 };
+
+/*-------------------------------------------------------------------------------*/
+/*                                 /myAccommodations/                            */
+/*-------------------------------------------------------------------------------*/
 
 exports.findAllMyEvents = async (req, res, next) => {
   try {
@@ -222,7 +218,7 @@ exports.findAllMyEvents = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.createOneMyEvent = async (req, res, next) => {
   try {
     clear();
     console.log(req.body);
@@ -263,7 +259,7 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateOneMyEvent = async (req, res, next) => {
   try {
     clear();
     const eventId = req.params.idEvent;
@@ -323,7 +319,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteOneMyEvent = async (req, res, next) => {
   try {
     clear();
     const eventId = req.params.idEvent; console.log(`eventId: ${eventId}`);

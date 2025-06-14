@@ -27,7 +27,7 @@ module.exports = function (sequelize, DataTypes) {
     },
 
     // --- Campos comuns ---
-    estado: {
+    status: {
       type: DataTypes.STRING,
       allowNull: false,
       defaultValue: 'inscrito',

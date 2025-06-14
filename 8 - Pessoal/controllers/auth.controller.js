@@ -37,13 +37,6 @@ exports.verifyToken = (req, res, next) => {
     }
 };
 
-exports.hello = async (req, res, next) => {
-   console.log("Hello")
-        return next();
-
-   
-};
-
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                               Verficar role do usuario logado                                                */
 /*--------------------------------------------------------------------------------------------------------------*/
@@ -67,13 +60,6 @@ exports.isAdminOrFacilitador = async (req, res, next) => {
         return next();
 
     next(new ErrorHandler(403, "This request requires ADMIN or FACILITADOR role!"))
-};
-
-exports.isAdminOrLoggedUser = async (req, res, next) => {
-    if (req.loggedUserRole === "admin" || req.loggedUserId == req.params.userID)
-        return next();
-
-    next(new ErrorHandler(403, "This request requires an ADMIN Role or you can only see you own data!"));
 };
 
 /*--------------------------------------------------------------------------------------------------------------*/

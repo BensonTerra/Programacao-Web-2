@@ -11,32 +11,33 @@ const Accommodation = db.accommodation;
 const Event = db.event;
 
 //necessary for LIKE operator
-const { Op, ValidationError, and } = require("sequelize");
+const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
 
-exports.findAll = async (req, res) => {
+exports.findAllAccommodationBookings = async (req, res) => {
   try {
     clear();
+
     const userId = req.loggedUserId;
-    //console.log("UserId:", userId);
 
     let accommodationId = req.params.idAccommodation;
-    //console.log("AccommodationId:", accommodationId);
-
-    let accommodation = await Accommodation.findByPk(accommodationId);
-    //console.log("Accommodation:", accommodation);
 
     let accommodationBookings = await AccommodationBooking.findAndCountAll({
       where: {
+        userId: userId,
         accommodationId: accommodationId,
       },
       order: [["from", "DESC"]],
-    }); //console.log("AccommodationBookings:", accommodationBookings);
+    });
+
+    if (!accommodationBookings || accommodationBookings.length === 0) {
+      throw new ErrorHandler(404, "No accommodationBookings found for this user.");
+    }
 
     return res.status(200).json({
       success: true,
       message: "Bookings retrieved successfully.",
-      dados: accommodationBookings.rows,
+      data: accommodationBookings.rows,
     });
   } catch (error) {
     console.error("Erro ao buscar reservas:", error);
@@ -47,7 +48,37 @@ exports.findAll = async (req, res) => {
   }
 };
 
-exports.create = async (req, res) => {
+exports.findAllEventBookings = async (req, res) => {
+  try {
+    clear();
+
+    const userId = req.loggedUserId;
+
+    let eventId = req.params.idEvent;
+
+    let eventBookings = await EventBooking.findAndCountAll({
+      where: {
+        userId: userId,
+        eventId: eventId,
+      },
+      order: [["id", "DESC"]],
+    });
+
+    if (!eventBookings || eventBookings.length === 0) {
+      throw new ErrorHandler(404, "No eventBookings found for this user.");
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings retrieved successfully.",
+      data: eventBookings.rows,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createOneBooking = async (req, res) => {
   try {
     clear();
     let novaReserva = {};
@@ -117,7 +148,7 @@ exports.create = async (req, res) => {
           where: {
             userId,
             eventId,
-            estado: "inscrito",
+            status: "inscrito",
           },
         });
 
@@ -142,7 +173,7 @@ exports.create = async (req, res) => {
       message: accommodationId
         ? "Reserva de alojamento criada com sucesso."
         : "Inscrição em evento criada com sucesso.",
-      dados: novaReserva,
+      data: novaReserva,
     });
   } catch (error) {
     console.error("Erro ao criar reserva:", error);
@@ -153,21 +184,17 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateOneAccommodationBooking = async (req, res, next) => {
   try {
     clear();
 
-    const accommodationId = req.params.idAccommodation;
+    const loggedUserId = req.loggedUserId;
+
     const accommodationBookingId = req.params.idAccommodationBooking;
 
-    // Busca a reserva por chave primária
     const accommodationBooking = await AccommodationBooking.findByPk(
       accommodationBookingId
     );
-
-    //Obter user logado para garantir que o utilizador autenticado é quem efetuou a reserva
-    const loggedUserId = req.loggedUserId;
-    //console.log(`Logged UserId: ${loggedUserId}`);
 
     // Se não encontrar a acomodação, lança erro 404
     if (!accommodationBooking) {
@@ -198,18 +225,6 @@ exports.update = async (req, res, next) => {
       success: true,
       message: `AccommodationBooking with ID ${accommodationBookingId} updated successfully.`,
       data: accommodationBooking,
-      links: [
-        {
-          rel: "self",
-          href: `/users/me/bookings/${accommodationBookingId}`,
-          method: "GET",
-        },
-        {
-          rel: "cancel",
-          href: `/users/me/bookings/${accommodationBookingId}`,
-          method: "DELETE",
-        },
-      ],
     });
   } catch (err) {
     next(err);
@@ -267,7 +282,7 @@ exports.validateAccommodationBooking = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Booking validated successfully.",
-      // dados: ...,
+      // data: ...,
     });
   } catch (error) {
     console.error("Error validating booking:", error);

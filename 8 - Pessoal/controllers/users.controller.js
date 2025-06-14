@@ -270,7 +270,7 @@ exports.findAllMyAccommodationBookings = async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: "AccommodationBookings retrieved successfully.",
-    dados: accommodationBookings.rows,
+    data: accommodationBookings.rows,
   });
 };
 
@@ -305,7 +305,7 @@ exports.findOneMyAccommodationBooking = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Bookings retrieved successfully.",
-      dados: accommodationBooking,
+      data: accommodationBooking,
     });
   } catch (err) {
     next(err);
@@ -352,7 +352,7 @@ exports.updateOneMyAccommodationBooking = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `AccommodationBooking with ID ${accommodationBookingId} updated successfully.`,
-      dados: accommodationBooking,
+      data: accommodationBooking,
     });
   } catch (err) {
     next(err);
@@ -434,7 +434,7 @@ exports.findAllMyEventBookings = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "EventBookings retrieved successfully.",
-      dados: eventBookings.rows,
+      data: eventBookings.rows,
     });
   } catch (err) {
     next(err);
@@ -472,7 +472,7 @@ exports.findOneMyEventBooking = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "EventBookings retrieved successfully.",
-      dados: eventBooking,
+      data: eventBooking,
     });
   } catch (err) {
     next(err);
@@ -510,7 +510,7 @@ exports.deleteOneMyEventBooking = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `EventBooking with ID ${eventBookingId} delete successfully.`,
-      dados: eventBooking,
+      data: eventBooking,
     });
   } catch (err) {
     next(err);

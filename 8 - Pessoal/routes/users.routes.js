@@ -2,44 +2,60 @@ const express = require('express');
 const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/users.controller");
 
-// express router
-let router = express.Router();
+const router = express.Router();
 
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                                         ÁREA PRIVADA (Administrador)                                         */
+/*--------------------------------------------------------------------------------------------------------------*/
 
-
+// Operações administrativas sobre usuários
 router.route('/')
-    .get(authController.verifyToken, authController.isAdmin, usersController.findAllUsers)
-    .post(usersController.create)
+  .get(authController.verifyToken, authController.isAdmin, usersController.findAllUsers)
+  .post(usersController.create);
 
 router.route('/:idUser')
-    .get(authController.verifyToken, authController.isAdmin, usersController.findOneUser)
-    .patch(authController.verifyToken, authController.isAdmin, usersController.updateOneUser)
-    .delete(authController.verifyToken, authController.isAdmin, usersController.deleteOneUser)
+  .get(authController.verifyToken, authController.isAdmin, usersController.findOneUser)
+  .patch(authController.verifyToken, authController.isAdmin, usersController.updateOneUser) //modifcar cargo
+  .delete(authController.verifyToken, authController.isAdmin, usersController.deleteOneUser);
 
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
+/*--------------------------------------------------------------------------------------------------------------*/
 
-router.route('/login')
-    .post(usersController.login)
-
-    
-router.route('/me/accommodationBookings') 
-    .get(authController.verifyToken,  authController.isAdminOrFacilitador, usersController.findAllMyAccommodationBookings);
+// Listar todas as reservas de acomodações do próprio usuário (com permissão)
+router.route('/me/accommodationBookings')
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findAllMyAccommodationBookings);
 
 router.route('/me/accommodationBookings/:idAccommodationBooking')
-    .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyAccommodationBooking)
-    .patch(authController.verifyToken, authController.isAdminOrFacilitador, usersController.updateOneMyAccommodationBooking)
-    .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyAccommodationBooking)
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyAccommodationBooking)
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, usersController.updateOneMyAccommodationBooking)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyAccommodationBooking);
 
-router.route('/me/eventBookings') 
-    .get(authController.verifyToken,  authController.isAdminOrFacilitador, usersController.findAllMyEventBookings);
+// Listar todas as reservas de eventos do próprio usuário (com permissão)
+router.route('/me/eventBookings')
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findAllMyEventBookings);
 
 router.route('/me/eventBookings/:idEventBooking')
-    .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyEventBooking)
-    .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyEventBooking)
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyEventBooking)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyEventBooking);
 
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                                         ÁREA PÚBLICA DO UTILIZADOR                                           */
+/*--------------------------------------------------------------------------------------------------------------*/
 
-router.all('*', function (req, res) {
-    //send an predefined error message 
-    res.status(400).json({ success: false, message:`The API does not recognize the request on ${req.method} ${req.url}` });
-})
+// Login do usuário
+router.route('/login')
+  .post(usersController.login);
+
+/*--------------------------------------------------------------------------------------------------------------*/
+/*                                          ROTA PARA ERROS GENÉRICOS                                           */
+/*--------------------------------------------------------------------------------------------------------------*/
+
+router.all('*', (req, res) => {
+  res.status(400).json({
+    success: false,
+    message: `The API does not recognize the request on ${req.method} ${req.url}`
+  });
+});
 
 module.exports = router;

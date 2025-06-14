@@ -9,22 +9,18 @@ const router = express.Router();
 /*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
 /*--------------------------------------------------------------------------------------------------------------*/
 
-// Listar ou criar minhas acomodações
 router.route('/myAccommodations')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findAllMyAccommodations)
-  .post(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.create);
+  .post(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.createOneMyAccommodation);
 
-// Ver, atualizar ou deletar uma das minhas acomodações
 router.route('/myAccommodations/:idAccommodation')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findOneAccommodation)
-  .patch(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.update)
-  .delete(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.delete);
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.updateOneMyAccommodation)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.deleteOneMyAccommodation);
 
-// Ver todas as reservas de uma das acomodações
 router.route('/myAccommodations/:idAccommodation/bookings')
-  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAll);
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings);
 
-// Validar uma reserva específica de uma acomodação minha
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
 
@@ -42,7 +38,7 @@ router.route('/:idAccommodation')
 
 // Criar reserva pública para uma acomodação (requer login e permissão)
 router.route('/:idAccommodation/booking')
-  .post(authController.verifyToken, bookingsController.create);
+  .post(authController.verifyToken, bookingsController.createOneBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                         TRATAMENTO DE ROTA INVÁLIDA                                          */

@@ -168,9 +168,7 @@ exports.findOneAccommodation = async (req, res, next) => {
   try {
     clear();
     const accommodationId = req.params.idAccommodation;
-    console.log(`accommodationId: ${accommodationId}`);
 
-    // Busca o utilizador por chave primária SEM dependência das relações
     const accommodation = await Accommodation.findByPk(accommodationId, {
       // Deixa a estrutura de include comentada para uso futuro
       /*
@@ -188,7 +186,6 @@ exports.findOneAccommodation = async (req, res, next) => {
       */
     });
 
-    // Se não encontrar o accommodation, lança erro 404
     if (!accommodation) {
       throw new ErrorHandler(
         404,
@@ -196,27 +193,23 @@ exports.findOneAccommodation = async (req, res, next) => {
       );
     }
 
-    // Retorna os dados do utilizador com links HATEOAS
     return res.json({
       success: true,
       data: accommodation,
       links: [
-        {
-          rel: "modify",
-          href: `/accommodations/${accommodation.id}`,
-          method: "PUT",
-        },
-        {
-          rel: "delete",
-          href: `/accommodations/${accommodation.id}`,
-          method: "DELETE",
-        },
+        { rel: "modify", href: `/accommodations/${accommodation.id}`, method: "PUT" },
+        { rel: "delete", href: `/accommodations/${accommodation.id}`, method: "DELETE" },
       ],
     });
   } catch (err) {
     next(err);
   }
 };
+
+/*-------------------------------------------------------------------------------*/
+/*                                 /myAccommodations/                            */
+/*-------------------------------------------------------------------------------*/
+
 
 exports.findAllMyAccommodations = async (req, res, next) => {
   try {
@@ -227,7 +220,7 @@ exports.findAllMyAccommodations = async (req, res, next) => {
     let Accommodations = await Accommodation.findAndCountAll({
       where: { createdByUserId: userId },
       raw: true,
-    }); console.log(`Accommodations: ${Accommodations}`);
+    });
 
     // Se não encontrar acomodações, lança erro 404
     if (!Accommodations || Accommodations.length === 0) {
@@ -264,7 +257,7 @@ exports.findAllMyAccommodations = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.createOneMyAccommodation = async (req, res, next) => {
   try {
     clear();
 
@@ -307,7 +300,7 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateOneMyAccommodation = async (req, res, next) => {
   try {
     clear();
     
@@ -364,7 +357,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteOneMyAccommodation = async (req, res, next) => {
   try {
     clear();
     const accommodationId = req.params.idAccommodation;

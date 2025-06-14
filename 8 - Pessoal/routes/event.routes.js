@@ -3,8 +3,7 @@ const authController = require("../controllers/auth.controller");
 const eventsController = require("../controllers/events.controller");
 const bookingsController = require("../controllers/booking.controller");
 
-// express router
-let router = express.Router();
+const router = express.Router();
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                              ÁREA PRIVADA (Administrador / Facilitador)                                      */
@@ -12,16 +11,15 @@ let router = express.Router();
 
 router.route('/myEvents')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.findAllMyEvents)
-  .post(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.create);
+  .post(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.createOneMyEvent);
 
 router.route('myEvents/:idEvent')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.findOneEvent)
-  .patch(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.update)
-  .delete(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.delete);
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.updateOneMyEvent)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.deleteOneMyEvent);
 
 router.route('/myEvents/:idEvent/bookings')
-  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAll);
-  //PATCH
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllEventBookings);
   //DELETE
 
 /*--------------------------------------------------------------------------------------------------------------*/
@@ -38,7 +36,7 @@ router.route('/:idEvent')
 
 // Criar reserva pública para uma acomodação (requer login e permissão)
 router.route('/:idEvent/booking')
-  .post(authController.verifyToken, bookingsController.create);
+  .post(authController.verifyToken, bookingsController.createOneBooking);
 
 
 /*
