@@ -471,7 +471,7 @@ exports.deleteOneMyEventBooking = async (req, res, next) => {
     clear();
 
     const loggedUserId = req.loggedUserId;
-    const eventBookingId = req.params.idAccommodationBooking;
+    const eventBookingId = req.params.idEventBooking;
 
     const eventBooking = await EventBooking.findOne({
       where: {
@@ -494,10 +494,11 @@ exports.deleteOneMyEventBooking = async (req, res, next) => {
       );
     }
 
+    eventBooking.destroy()
+
     return res.status(200).json({
       success: true,
       message: `EventBooking with ID ${eventBookingId} delete successfully.`,
-      data: eventBooking,
     });
   } catch (err) {
     next(err);

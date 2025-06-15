@@ -41,50 +41,28 @@ exports.findAllEvents = async (req, res, next) => {
 
   const condition = {
     ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
+    ...(location ? { location: { [Op.like]: `%${location}%` } } : {}),
+    ...(price ? { price: {[Op.gte]: price } } : {}),
   };
 
   if (start_date && end_date) {
-    const startDate = new Date(start_date);
-    const endDate = new Date(end_date);
+  const startDate = new Date(start_date);
+  const endDate = new Date(end_date);
 
-    condition.available_from = { [Op.lte]: startDate };
-    condition.available_to = { [Op.gte]: endDate };
-
-    const overlappingBookings = await eventBooking.findAll({
-      attributes: ["eventId"],
-      where: {
-        [Op.or]: [
-          {
-            data_inicio: {
-              [Op.between]: [startDate, endDate],
-            },
-          },
-          {
-            data_fim: {
-              [Op.between]: [startDate, endDate],
-            },
-          },
-          {
-            data_inicio: {
-              [Op.lte]: startDate,
-            },
-            data_fim: {
-              [Op.gte]: endDate,
-            },
-          },
-        ],
+  condition[Op.and] = [
+    {
+      available_from: {
+        [Op.lte]: endDate, // evento começa antes ou no fim do intervalo
       },
-      raw: true,
-    });
+    },
+    {
+      available_to: {
+        [Op.gte]: startDate, // evento termina depois ou no início do intervalo
+      },
+    },
+  ];
+}
 
-    const busyIds = overlappingBookings.map((a) => a.eventId);
-
-    if (busyIds.length > 0) {
-      condition.id = {
-        [Op.notIn]: busyIds,
-      };
-    }
-  }
 
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
     return res
