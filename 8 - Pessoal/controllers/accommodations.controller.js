@@ -188,7 +188,7 @@ exports.findOneAccommodation = async (req, res, next) => {
     clear();
     const accommodationId = req.params.idAccommodation;
 
-    const accommodation = await AccommodationRating.findByPk(accommodationId, {
+    const accommodation = await Accommodation.findByPk(accommodationId, {
       // Deixa a estrutura de include comentada para uso futuro
       /*
       include: [

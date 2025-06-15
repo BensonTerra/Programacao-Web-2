@@ -24,35 +24,34 @@ router.route('/myAccommodations/:idAccommodation')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findOneAccommodation)
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.updateOneMyAccommodation)
   .delete(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.deleteOneMyAccommodation);
-    
-router.route('/myAccommodations/:idAccommodation/rating') //Criar no postman
-  .get(authController.verifyToken,authController.isAdminOrFacilitador, accommodationsController.findAllAccommodationRatings) 
 
 router.route('/myAccommodations/:idAccommodation/bookings')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings)
-// .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
 
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
+    
+router.route('/myAccommodations/:idAccommodation/ratings')
+  .get(authController.verifyToken,authController.isAdminOrFacilitador, accommodationsController.findAllAccommodationRatings) 
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */
 /*--------------------------------------------------------------------------------------------------------------*/
-
 router.route('/')
   .get(accommodationsController.findAllAccommodations);
 
 router.route('/:idAccommodation')
   .get(accommodationsController.findOneAccommodation);
+
+router.route('/:idAccommodation/booking')
+  .post(authController.verifyToken, bookingsController.createOneBooking);
   
-router.route('/:idAccommodation/rating')
+router.route('/:idAccommodation/ratings')
   .get(authController.verifyToken, accommodationsController.findAllAccommodationRatings) 
   .post(authController.verifyToken, accommodationsController.createOneAccommodationRating)
   .patch(authController.verifyToken, accommodationsController.updateOneAccommodationRating)
   .delete(authController.verifyToken, accommodationsController.deleteOneAccommodationRating);
-
-router.route('/:idAccommodation/booking')
-  .post(authController.verifyToken, bookingsController.createOneBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                         TRATAMENTO DE ROTA INVÁLIDA                                          */

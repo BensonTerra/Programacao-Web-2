@@ -159,10 +159,6 @@ exports.findOneEvent = async (req, res, next) => {
     return res.json({
       success: true,
       data: event,
-      links: [
-        { rel: "modify", href: `/Events/${event.id}`, method: "PUT" },
-        { rel: "delete", href: `/Events/${event.id}`, method: "DELETE" },
-      ],
     });
   } catch (err) {
     next(err);
