@@ -172,7 +172,6 @@ exports.findOneEvent = async (req, res, next) => {
 /*-------------------------------------------------------------------------------*/
 /*                                 /myEvents/                                    */
 /*-------------------------------------------------------------------------------*/
-
 exports.findAllMyEvents = async (req, res, next) => {
   try {
     clear();
@@ -229,8 +228,8 @@ exports.createOneMyEvent = async (req, res, next) => {
       description: req.body.description,
       location: req.body.location,
       price: req.body.price,
-      available_from: req.body.startDate,
-      available_to: req.body.endDate,
+      available_from: req.body.available_from,
+      available_to: req.body.available_to,
     });
 
     return res.status(200).json({
@@ -263,7 +262,6 @@ exports.updateOneMyEvent = async (req, res, next) => {
   try {
     clear();
     const eventId = req.params.idEvent;
-    //console.log(`eventId: ${eventId}`);
 
     // Busca a acomodação por chave primária
     const event = await Event.findByPk(eventId);
@@ -292,8 +290,8 @@ exports.updateOneMyEvent = async (req, res, next) => {
     event.description = req.body.description || event.description;
     event.location = req.body.location || event.location;
     event.price = req.body.price || event.price;
-    event.available_from = req.body.startDate || event.available_from;
-    event.available_to = req.body.endDate || event.available_to;
+    event.available_from = req.body.available_from || event.available_from;
+    event.available_to = req.body.available_to || event.available_to;
 
     // Salva as alterações na base de dados
     await event.save();

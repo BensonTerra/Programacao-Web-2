@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require("../controllers/auth.controller");
 const usersController = require("../controllers/users.controller");
+const accommodationsController = require("../controllers/accommodations.controller");
 
 const router = express.Router();
 
@@ -38,6 +39,14 @@ router.route('/me/eventBookings')
 router.route('/me/eventBookings/:idEventBooking')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, usersController.findOneMyEventBooking)
   .delete(authController.verifyToken, authController.isAdminOrFacilitador, usersController.deleteOneMyEventBooking);
+
+router.route('/me/accommodationRatings')
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findAllAccommodationRatings);
+
+router.route('/me/accommodationRatings/:idAccommodationRating')
+  .get(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.findOneAccommodationRating)
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.updateOneAccommodationRating)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, accommodationsController.deleteOneAccommodationRating);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                         ÁREA PÚBLICA DO UTILIZADOR                                           */

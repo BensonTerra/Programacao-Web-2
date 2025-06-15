@@ -10,9 +10,13 @@ const EventBooking = db.eventBooking;
 const Accommodation = db.accommodation;
 const Event = db.event;
 
-//necessary for LIKE operator
 const { Op, ValidationError } = require("sequelize");
 const clear = require("clear");
+
+
+/*-------------------------------------------------------------------------------*/
+/*                                 /myAccommodations/                            */
+/*-------------------------------------------------------------------------------*/
 
 exports.findAllAccommodationBookings = async (req, res) => {
   try {
@@ -36,7 +40,7 @@ exports.findAllAccommodationBookings = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Bookings retrieved successfully.",
+      message: "AccommodationBookings retrieved successfully.",
       data: accommodationBookings.rows,
     });
   } catch (error) {
@@ -76,7 +80,7 @@ exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      data: `EventBooking with ID ${accommodationId} deleted successfully.`,
+      data: `AccommoadationBooking with ID ${accommodationId} deleted successfully.`,
     });
   } catch (err) {
     next(err);
@@ -105,7 +109,7 @@ exports.findAllEventBookings = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Bookings retrieved successfully.",
+      message: "EventBooking retrieved successfully.",
       data: eventBookings.rows,
     });
   } catch (err) {

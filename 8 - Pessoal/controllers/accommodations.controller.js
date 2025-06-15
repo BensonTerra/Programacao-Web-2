@@ -120,7 +120,7 @@ exports.findAllAccommodations = async (req, res, next) => {
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
   try {
-    let Accommodations = await AccommodationRating.findAndCountAll({
+    let Accommodations = await Accommodation.findAndCountAll({
       where: condition,
       include,
       attributes: {
@@ -408,20 +408,30 @@ exports.deleteOneMyAccommodation = async (req, res, next) => {
 /*                          accommodationRating                        */
 /*---------------------------------------------------------------------*/
 
-exports.findAllAccommodationRatings = async (req, res, next) => {
+exports.findAllAccommodationRatings = async (req, res, next) => { //trocar nome da função e estrutura de response
   try {
     clear();
     const userId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation;
+    let AccommodationRatings = {}
 
-    // Busca todas as acomodações criadas pelo utilizador autenticado
-    let AccommodationRatings = await AccommodationRating.findAndCountAll({
-      where: {
-        userId: userId,
-        accommodationId: accommodationId
-      },
-      raw: true,
-    });
+    if (accommodationId) {
+      AccommodationRatings = await AccommodationRating.findAndCountAll({
+        where: {
+          userId: userId,
+          accommodationId: accommodationId
+        },
+        raw: true,
+      });
+    } 
+    else {
+      AccommodationRatings = await AccommodationRating.findAndCountAll({
+        where: {
+          userId: userId,
+        },
+        raw: true,
+      });
+    }
 
     // Se não encontrar acomodações, lança erro 404
     if (!AccommodationRatings || AccommodationRatings.length === 0) {
@@ -432,6 +442,37 @@ exports.findAllAccommodationRatings = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: AccommodationRatings,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.findOneAccommodationRating = async (req, res, next) => {
+  try {
+    clear();
+
+    const loggedUserId = req.loggedUserId;
+    const accommodationRatingId = req.params.idAccommodationRating;
+    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+
+    if (!accommodationRating) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodationRating with ID ${accommodationRatingId}.`
+      );
+    }
+
+    if (accommodationRating.userId !== loggedUserId) {
+      throw new ErrorHandler(
+        403,
+        `You are not allowed to update this accommodationRating.`
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: accommodationRating,
     });
   } catch (err) {
     next(err);
@@ -474,7 +515,7 @@ exports.updateOneAccommodationRating = async (req, res, next) => {
     clear();
 
     const loggedUserId = req.loggedUserId;
-    const accommodationRatingId = req.params.idAccommodation;
+    const accommodationRatingId = req.params.idAccommodationRating;
     const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
 
     if (!accommodationRating) {

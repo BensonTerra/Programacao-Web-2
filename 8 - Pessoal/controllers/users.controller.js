@@ -10,7 +10,6 @@ const Accommodation = db.accommodation; //usar para identificar a acomodação r
 const AccommodationBooking = db.accommodationBooking;
 const Event = db.event;
 const EventBooking = db.eventBooking;
-const AccommodationRating = db.accommodationRating
 
 //necessary for LIKE operator
 const { Op, ValidationError, where } = require("sequelize");
@@ -255,7 +254,6 @@ exports.deleteOneUser = async (req, res, next) => {
 /*---------------------------------------------------------------------*/
 /*                        accommodationBookings                        */
 /*---------------------------------------------------------------------*/
-
 exports.findAllMyAccommodationBookings = async (req, res, next) => {
   clear();
   
@@ -281,6 +279,13 @@ exports.findOneMyAccommodationBooking = async (req, res, next) => {
 
     const loggedUserId = req.loggedUserId;
     const accommodationBookingId = req.params.idAccommodationBooking;
+
+    if (!accommodationBookingId) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any accommodationBookingId with ID ${accommodationBookingId}.`
+      );
+    }
 
     const accommodationBooking = await AccommodationBooking.findOne({
       where: {
@@ -407,7 +412,6 @@ exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
 /*---------------------------------------------------------------------*/
 /*                            eventBookings                            */
 /*---------------------------------------------------------------------*/
-
 exports.findAllMyEventBookings = async (req, res, next) => {
   clear();
 
@@ -447,7 +451,14 @@ exports.findOneMyEventBooking = async (req, res, next) => {
     clear();
 
     const loggedUserId = req.loggedUserId;
-    const eventBookingId = req.params.idAccommodationBooking;
+    const eventBookingId = req.params.idEventBooking;
+
+    if (!eventBookingId) {
+      throw new ErrorHandler(
+        404,
+        `Cannot find any eventBookingId with ID ${eventBookingId}.`
+      );
+    }
 
     const eventBooking = await EventBooking.findOne({
       where: {

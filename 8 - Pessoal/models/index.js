@@ -58,14 +58,14 @@ db.accommodationRating.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
 // Association: Accommodation -> AccommodationRating
 db.accommodation.hasMany(db.accommodationRating, { foreignKey: 'accommodationId', as: 'ratings' });
-db.accommodationRating.belongsTo(db.accommodation, { foreignKey: 'accommodationId' });
+db.accommodationRating.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
 
 
 (async () => {
     try {;
         //await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
-        //await sequelize.sync();
+        //await sequelize.sync({ alter: true });
+        await sequelize.sync();
 
         clear()
         console.log('DB is successfully synchronized');

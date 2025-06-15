@@ -20,14 +20,14 @@ router.route('/myEvents')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.findAllMyEvents)
   .post(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.createOneMyEvent);
 
-router.route('myEvents/:idEvent')
+router.route('/myEvents/:idEvent')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.findOneEvent)
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.updateOneMyEvent)
   .delete(authController.verifyToken, authController.isAdminOrFacilitador, eventsController.deleteOneMyEvent);
 
 router.route('/myEvents/:idEvent/bookings')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllEventBookings)
-  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyEventBooking);
+//  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyEventBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */
@@ -43,7 +43,8 @@ router.route('/:idEvent')
 
 // Criar reserva pública para uma acomodação (requer login e permissão)
 router.route('/:idEvent/booking')
-  .post(authController.verifyToken, bookingsController.createOneBooking);
+  .post(authController.verifyToken, bookingsController.createOneBooking)
+  .delete(authController.verifyToken, bookingsController.deleteOneMyEventBooking);
 
 
 /*

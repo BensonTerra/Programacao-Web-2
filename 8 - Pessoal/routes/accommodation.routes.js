@@ -30,7 +30,7 @@ router.route('/myAccommodations/:idAccommodation/rating') //Criar no postman
 
 router.route('/myAccommodations/:idAccommodation/bookings')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings)
-  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
+// .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
 
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
   .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
