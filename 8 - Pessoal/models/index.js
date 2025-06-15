@@ -52,11 +52,9 @@ db.event.belongsToMany(db.user, { through: 'UserEventInterest', foreignKey: 'eve
 db.user.hasMany(db.accommodation, { foreignKey: 'createdByUserId', as: 'accommodations' });
 db.accommodation.belongsTo(db.user, { foreignKey: 'createdByUserId', as: 'creator' });
 
-// Association: User -> AccommodationRating
 db.user.hasMany(db.accommodationRating, { foreignKey: 'userId', as: 'userRatings' });
 db.accommodationRating.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 
-// Association: Accommodation -> AccommodationRating
 db.accommodation.hasMany(db.accommodationRating, { foreignKey: 'accommodationId', as: 'ratings' });
 db.accommodationRating.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
 

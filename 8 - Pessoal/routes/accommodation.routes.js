@@ -57,7 +57,6 @@ router.route('/:idAccommodation/ratings')
 /*                                         TRATAMENTO DE ROTA INVÁLIDA                                          */
 /*--------------------------------------------------------------------------------------------------------------*/
 
-// Qualquer outra rota não reconhecida
 router.all('*', (req, res) => {
   res.status(400).json({
     success: false,

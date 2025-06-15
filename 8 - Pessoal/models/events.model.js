@@ -41,7 +41,6 @@ module.exports = function (sequelize, DataTypes) {
           min: { args: [0], msg: "Price cannot be negative." },
         },
       },
-      // Availability
       available_from: {
         type: DataTypes.DATE,
         allowNull: true,

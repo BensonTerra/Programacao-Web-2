@@ -2,7 +2,6 @@ const Sequelize = require('sequelize');
 
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define('EventBookings', {
-    // Chaves primárias e estrangeiras
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -25,8 +24,6 @@ module.exports = function (sequelize, DataTypes) {
       },
       defaultValue: null,
     },
-
-    // --- Campos comuns ---
     status: {
       type: DataTypes.STRING,
       allowNull: false,

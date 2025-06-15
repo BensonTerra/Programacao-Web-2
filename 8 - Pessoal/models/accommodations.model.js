@@ -16,7 +16,6 @@ module.exports = function (sequelize, DataTypes) {
           key: "id",
         },
       },
-      // Title and description
       title: {
         type: DataTypes.STRING(200),
         allowNull: false,
@@ -29,8 +28,6 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-
-      // Location and room type
       location: {
         type: DataTypes.STRING(100),
         allowNull: true,
@@ -39,8 +36,6 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-
-      // Capacity
       bed_count: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -52,8 +47,6 @@ module.exports = function (sequelize, DataTypes) {
           },
         },
       },
-
-      // Price and rating
       price_per_night: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true,
@@ -74,8 +67,6 @@ module.exports = function (sequelize, DataTypes) {
           max: { args: [5], msg: "Rating cannot be more than 5." },
         },
       },
-
-      // Availability
       available_from: {
         type: DataTypes.DATE,
         allowNull: true,

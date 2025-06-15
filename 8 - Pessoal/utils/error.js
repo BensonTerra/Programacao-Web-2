@@ -1,4 +1,3 @@
-//  create error handler function
 class ErrorHandler extends Error {
     constructor(statusCode, message) {
       super();

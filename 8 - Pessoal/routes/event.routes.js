@@ -27,21 +27,17 @@ router.route('/myEvents/:idEvent')
 
 router.route('/myEvents/:idEvent/bookings')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllEventBookings)
-//  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyEventBooking);
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyEventBooking);
 
 /*--------------------------------------------------------------------------------------------------------------*/
 /*                                   ÁREA PÚBLICA DO UTILIZADOR                                                 */
 /*--------------------------------------------------------------------------------------------------------------*/
-
-// Listar todas as acomodações públicas
 router.route('/')
   .get(eventsController.findAllEvents);
 
-// Detalhes de uma acomodação pública por ID
 router.route('/:idEvent')
   .get(eventsController.findOneEvent);
 
-// Criar reserva pública para uma acomodação (requer login e permissão)
 router.route('/:idEvent/booking')
   .post(authController.verifyToken, bookingsController.createOneBooking)
   .delete(authController.verifyToken, bookingsController.deleteOneMyEventBooking);
@@ -58,7 +54,6 @@ router.route('/')
     .get(eventsController.findAllEvents)
 
 router.all('*', function (req, res) {
-    //send an predefined error message 
     res.status(400).json({ success: false, message:`The API does not recognize the request on ${req.method} ${req.url}` });
 })
 

@@ -15,7 +15,7 @@ const clear = require("clear");
 
 exports.findAllAccommodations = async (req, res, next) => {
   clear();
-  //get data from request query string (if not existing, they will be undefined)
+
   let {
     creatorName,
     title,
@@ -28,7 +28,7 @@ exports.findAllAccommodations = async (req, res, next) => {
     page,
     size,
   } = req.query;
-  //console.log(`Query Params: ${JSON.stringify(req.query)}`);
+
 
   let include = [];
 
@@ -41,9 +41,8 @@ exports.findAllAccommodations = async (req, res, next) => {
       },
       attributes: [],
     });
-  } //console.log(JSON.stringify(include, null, 2));
+  }
 
-  // search by title require to build a query with the operator L
   const condition = {
     ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
     ...(location ? { location: { [Op.like]: `%${location}%` } } : {}),
@@ -52,19 +51,13 @@ exports.findAllAccommodations = async (req, res, next) => {
     ...(price_per_night ? { price_per_night: price_per_night } : {}),
   };
 
-  //console.log(condition);
-
   if (start_date && end_date) {
     const startDate = new Date(start_date);
-    console.log(`startDate ${startDate}`);
     const endDate = new Date(end_date);
-    console.log(`endDate ${endDate}`);
 
-    // Verifica se a acomodação está disponível no período
     condition.available_from = { [Op.lte]: startDate };
     condition.available_to = { [Op.gte]: endDate };
 
-    // Verifica se já há reservas no mesmo período
     const overlappingBookings = await accommodationBooking.findAll({
       attributes: ["accommodationId"],
       where: {
@@ -101,21 +94,16 @@ exports.findAllAccommodations = async (req, res, next) => {
     }
   }
 
-  // validate page
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
     return res
       .status(400)
       .json({ message: "Page number must be 0 or a positive integer" });
-  page = parseInt(page); // if OK, convert it into an integer
+  page = parseInt(page); 
 
-  // validate size
   if (size && !req.query.size.match(/^([1-9]\d*)$/g))
     return res.status(400).json({ message: "Size must be a positive integer" });
-  size = parseInt(size); // if OK, convert it into an integer
+  size = parseInt(size); 
 
-  // Sequelize function findAndCountAll parameters:
-  // limit -> number of rows to be retrieved
-  // Offset -> number of rows to be offseted (not retrieved)
   const limit = size ? size : 5; // limit = size (default is 5)
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
@@ -139,24 +127,12 @@ exports.findAllAccommodations = async (req, res, next) => {
       offset,
       raw: true,
     });
-
-    /* map HATEOAS links to each one of the accommodations
-    accommodations.rows.forEach(accommodation => {
-      accommodation.links = [
-        { rel: "self", href: `/accommodations/${accommodation.id}`, method: "GET" },
-        { rel: "modify", href: `/accommodations/${accommodation.id}`, method: "PUT" },
-        { rel: "delete", href: `/accommodations/${accommodation.id}`, method: "DELETE" },
-      ]
-    });
-    */
-
-    // formata a data para 'YYYY-MM-DD'
+    
     const formatDate = (isoDate) => {
       if (!isoDate) return null;
       return new Date(isoDate).toISOString().split("T")[0];
     };
 
-    // mapeia as acomodações e formata as datas
     const formattedData = Accommodations.rows.map((acc) => ({
       ...acc,
       available_from: formatDate(acc.available_from),
@@ -189,20 +165,6 @@ exports.findOneAccommodation = async (req, res, next) => {
     const accommodationId = req.params.idAccommodation;
 
     const accommodation = await Accommodation.findByPk(accommodationId, {
-      // Deixa a estrutura de include comentada para uso futuro
-      /*
-      include: [
-        {
-          model: db.comment,
-          attributes: ["id", "text"],
-        },
-        {
-          model: db.tag,
-          attributes: ["name"],
-          through: { attributes: [] },
-        },
-      ],
-      */
     });
 
     if (!accommodation) {
@@ -241,33 +203,27 @@ exports.findAllMyAccommodations = async (req, res, next) => {
   try {
     clear();
     const userId = req.loggedUserId;
-    console.log(`UserId: ${userId}`);
 
-    // Busca todas as acomodações criadas pelo utilizador autenticado
     let Accommodations = await Accommodation.findAndCountAll({
       where: { createdByUserId: userId },
       raw: true,
     });
 
-    // Se não encontrar acomodações, lança erro 404
     if (!Accommodations || Accommodations.length === 0) {
       throw new ErrorHandler(404, "No accommodations found for this user.");
     }
 
-    // formata a data para 'YYYY-MM-DD'
     const formatDate = (isoDate) => {
       if (!isoDate) return null;
       return new Date(isoDate).toISOString().split("T")[0];
     };
 
-    // mapeia as acomodações e formata as datas
     const formattedData = Accommodations.rows.map((acc) => ({
       ...acc,
       available_from: formatDate(acc.available_from),
       available_to: formatDate(acc.available_to),
     }));
 
-    // Retorna os dados das acomodações com links HATEOAS
     return res.status(200).json({
       success: true,
       data: formattedData,
@@ -369,16 +325,11 @@ exports.deleteOneMyAccommodation = async (req, res, next) => {
   try {
     clear();
     const accommodationId = req.params.idAccommodation;
-    //console.log(`AccommodationId: ${accommodationId}`);
 
-    // Busca a acomodação por chave primária
     const accommodation = await Accommodation.findByPk(accommodationId);
 
-    //Obter user logado para garantir que o utilizador autenticado é o dono da acomodação
     const loggedUserId = req.loggedUserId;
-    //console.log(`Logged UserId: ${loggedUserId}`);
 
-    // Se não encontrar a acomodação, lança erro 404
     if (!accommodation) {
       throw new ErrorHandler(
         404,
@@ -408,7 +359,7 @@ exports.deleteOneMyAccommodation = async (req, res, next) => {
 /*                          accommodationRating                        */
 /*---------------------------------------------------------------------*/
 
-exports.findAllAccommodationRatings = async (req, res, next) => { //trocar nome da função e estrutura de response
+exports.findAllAccommodationRatings = async (req, res, next) => { 
   try {
     clear();
     const userId = req.loggedUserId;
@@ -433,12 +384,10 @@ exports.findAllAccommodationRatings = async (req, res, next) => { //trocar nome 
       });
     }
 
-    // Se não encontrar acomodações, lança erro 404
     if (!AccommodationRatings || AccommodationRatings.length === 0) {
       throw new ErrorHandler(404, "No accommodationRating found for this user.");
     }
 
-    // Retorna os dados das acomodações com links HATEOAS
     return res.status(200).json({
       success: true,
       data: AccommodationRatings,

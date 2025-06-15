@@ -174,8 +174,8 @@ exports.createOneBooking = async (req, res) => {
           });
         }
 
-        const alojamento = await Accommodation.findByPk(accommodationId); //console.log(alojamento);
-        if (!alojamento) {
+        const accommodation = await Accommodation.findByPk(accommodationId);
+        if (!accommodation) {
           return res
             .status(404)
             .json({ errorMessage: "Alojamento não encontrado." });
@@ -198,7 +198,6 @@ exports.createOneBooking = async (req, res) => {
         }
       }
 
-      // Criar reserva ou inscrição
       novaReserva = await AccommodationBooking.create({
         userId,
         accommodationId,
@@ -210,7 +209,6 @@ exports.createOneBooking = async (req, res) => {
       });
     }
 
-    // Se for inscrição em evento
     if (eventId && eventId != 0) {
       if (eventId) {
         const evento = await Event.findByPk(eventId);
@@ -236,7 +234,6 @@ exports.createOneBooking = async (req, res) => {
           });
         }
       }
-      // Criar reserva ou inscrição
       novaReserva = await EventBooking.create({
         userId,
         eventId,
@@ -272,7 +269,6 @@ exports.updateOneAccommodationBooking = async (req, res, next) => {
       accommodationBookingId
     );
 
-    // Se não encontrar a acomodação, lança erro 404
     if (!accommodationBooking) {
       throw new ErrorHandler(
         404,
@@ -287,14 +283,12 @@ exports.updateOneAccommodationBooking = async (req, res, next) => {
       );
     }
 
-    // Atualiza os campos da accommodationBooking com os dados do corpo da requisição
     accommodationBooking.from = req.body.from || accommodationBooking.from;
     accommodationBooking.to = req.body.to || accommodationBooking.to;
     accommodationBooking.numPeople = req.body.numPeople || accommodationBooking.numPeople;
     accommodationBooking.status = "pendente";
     accommodationBooking.commentary = "";
 
-    // Salva as alterações na base de dados
     await accommodationBooking.save();
 
     return res.status(200).json({
@@ -313,17 +307,11 @@ exports.validateAccommodationBooking = async (req, res, next) => {
   try {
     clear();
     const loggedUserId = req.loggedUserId;
-    //console.log("LoggedUserId:", loggedUserId);
     const accommodationId = req.params.idAccommodation;
-    //console.log("accommodationId:", accommodationId);
     const accommodationBookingId = req.params.idAccommodationBooking;
-    //console.log("accommodationBookingId:", accommodationBookingId);
 
-    // Busca o alojamento associado à reserva
     const accommodation = await Accommodation.findByPk(accommodationId);
-    //console.log("Accommodation:", accommodation);
 
-    // Verifica se o utilizador autenticado é o dono do alojamento
     if (accommodation.createdByUserId !== loggedUserId) {
       throw new ErrorHandler(
         403,
@@ -335,11 +323,9 @@ exports.validateAccommodationBooking = async (req, res, next) => {
       throw new ErrorHandler(404, `Accommodation not found for this booking.`);
     }
 
-    // Busca a reserva
     const accommodationBooking = await AccommodationBooking.findByPk(
       accommodationBookingId
     );
-    console.log("AccommodationBooking:", accommodationBooking);
 
     if (!accommodationBooking) {
       throw new ErrorHandler(
@@ -355,15 +341,12 @@ exports.validateAccommodationBooking = async (req, res, next) => {
     accommodationBooking.from = accommodationBooking.from;
     accommodationBooking.to = accommodationBooking.to;
 
-    console.log("Updated Booking:", accommodationBooking);
 
     return res.status(200).json({
       success: true,
       message: "Booking validated successfully.",
-      // data: ...,
     });
-  } catch (error) {
-    console.error("Error validating booking:", error);
-    next(error); // encaminha para middleware de erro central
+  } catch (err) {
+    next(err); 
   }
 };

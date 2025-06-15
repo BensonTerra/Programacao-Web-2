@@ -6,12 +6,11 @@ const { ErrorHandler } = require("../utils/error.js");
 
 const db = require("../models/index.js");
 const User = db.user;
-const Accommodation = db.accommodation; //usar para identificar a acomodação referente a reserva
+const Accommodation = db.accommodation;
 const AccommodationBooking = db.accommodationBooking;
 const Event = db.event;
 const EventBooking = db.eventBooking;
 
-//necessary for LIKE operator
 const { Op, ValidationError, where } = require("sequelize");
 const clear = require("clear");
 
@@ -22,11 +21,9 @@ exports.create = async (req, res, next) => {
   try {
     clear();
 
-    // Verifica se já existe um usuário com o mesmo e-mail
     const existingUser = await User.findOne({
       where: { email: req.body.email },
     });
-    //console.log(`existingUser: ${existingUser}`);
 
     if (existingUser) {
       return res.status(409).json({
@@ -35,17 +32,12 @@ exports.create = async (req, res, next) => {
       });
     }
 
-    //console.log(`req.body: ${req.body.username}, ${req.body.email}, ${req.body.password}`);
-
-    // Cria o novo usuário
     let user = await User.create({
       username: req.body.username,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 10),
     });
-    //console.log(`user: ${user}`);
 
-    // Retorna o usuário criado com os links HATEOAS
     return res.status(201).json({
       success: true,
       data: user,
@@ -76,18 +68,13 @@ exports.login = async (req, res, next) => {
 
     let user = await User.findOne({
       where: { username: req.body.username },
-    }); //console.log(`user: ${user.username}, ${user.email}, ${user.password}`);
-
+    });
     if (!user) throw new ErrorHandler(404, "User not found.");
 
-    // decrypt psswd from DB and compare with the provided psswd in request
-    // tests a string (password in body) against a hash (password in database)​
     const check = bcrypt.compareSync(req.body.password, user.password);
 
     if (!check) throw new ErrorHandler(401, "Invalid credentials!");
 
-    //UNSAFE TO STORE EVERYTHING OF USER, including PSSWD
-    // sign the given payload (user ID) into a JWT payload – builds JWT token, using secret key
     const token = jwt.sign({ id: user.id, role: user.role }, JWTconfig.SECRET, {
       expiresIn: "24h", // 24 hours
       // expiresIn: '20m' // 20 minutes
@@ -128,21 +115,17 @@ exports.findAllUsers = async (req, res, next) => {
     ...(email ? { email: { [Op.like]: `%${email}%` } } : {}),
     ...(role ? { role: { [Op.like]: `%${role}%` } } : {}),
   }; 
-  //console.log(condition);
 
   if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
     return res
       .status(400)
       .json({ message: "Page number must be 0 or a positive integer" });
-  page = parseInt(page); // if OK, convert it into an integer
+  page = parseInt(page); 
 
-  // validate size
   if (size && !req.query.size.match(/^([1-9]\d*)$/g))
     return res.status(400).json({ message: "Size must be a positive integer" });
-  size = parseInt(size); // if OK, convert it into an integer
+  size = parseInt(size);
 
-  // limit -> number of rows to be retrieved
-  // Offset -> number of rows to be offseted (not retrieved)
   const limit = size ? size : 5; // limit = size (default is 5)
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
 
@@ -155,7 +138,6 @@ exports.findAllUsers = async (req, res, next) => {
       raw: true,
     });
 
-    // map default response to desired response data structure
     return res.status(200).json({
       success: true,
       data: users.rows,
@@ -171,16 +153,14 @@ exports.findAllUsers = async (req, res, next) => {
 exports.findOneUser = async (req, res, next) => {
   try {
     clear();
-    const userId = req.params.idUser; //console.log(`userId: ${userId}`);
+    const userId = req.params.idUser;
 
-    // Busca o utilizador por chave primária SEM dependência das relações
     const user = await User.findByPk(userId)
-    // Se não encontrar o user, lança erro 404
+
     if (!user) {
       throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
     }
 
-    // Retorna os dados do utilizador com links HATEOAS
     return res.json({
       success: true,
       data: user,
@@ -197,18 +177,16 @@ exports.findOneUser = async (req, res, next) => {
 exports.updateOneUser = async (req, res, next) => {
   try {
     clear();
-    const userId = req.params.idUser; //console.log(`userId: ${userId}`);
+    const userId = req.params.idUser;
 
-    // Busca o utilizador por chave primária SEM dependência das relações
     const user = await User.findByPk(userId)
-    // Se não encontrar o user, lança erro 404
+
     if (!user) {
       throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
     }
 
     user.role = req.body.role || user.role;
 
-    // Retorna os dados do utilizador com links HATEOAS
     return res.json({
       success: true,
       data: `User with ID ${userId} updated successfully.`,
@@ -222,9 +200,8 @@ exports.deleteOneUser = async (req, res, next) => {
   try {
     clear();
 
-    const userId = req.params.idUser; //console.log(`userId: ${userId}`);
+    const userId = req.params.idUser;
 
-    // Impede o usuário de excluir a si mesmo
     if (req.loggedUserId = userId) {
       return res.status(403).json({
         success: false,
@@ -232,16 +209,14 @@ exports.deleteOneUser = async (req, res, next) => {
       });
     }
 
-    // Busca o utilizador por chave primária SEM dependência das relações
     const user = await User.findByPk(userId)
-    // Se não encontrar o user, lança erro 404
+
     if (!user) {
       throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);
     }
 
     user.destroy();
 
-    // Retorna os dados do utilizador com links HATEOAS
     return res.json({
       success: true,
       data: `User with ID ${userId} deleted successfully.`,
@@ -257,7 +232,7 @@ exports.deleteOneUser = async (req, res, next) => {
 exports.findAllMyAccommodationBookings = async (req, res, next) => {
   clear();
   
-  const loggedUserId = req.loggedUserId; console.log(loggedUserId);  
+  const loggedUserId = req.loggedUserId; 
 
   let accommodationBookings = await AccommodationBooking.findAndCountAll({
     where: {
