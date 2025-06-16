@@ -7,7 +7,7 @@ const { ErrorHandler } = require("../utils/error.js");
 const db = require("../models/index.js");
 const Accommodation = db.accommodation;
 const accommodationBooking = db.accommodationBooking;
-const AccommodationRating =db.accommodationRating
+const AccommodationRating = db.accommodationRating;
 const User = db.user;
 
 const { Sequelize, Op, ValidationError } = require("sequelize");
@@ -28,7 +28,6 @@ exports.findAllAccommodations = async (req, res, next) => {
     page,
     size,
   } = req.query;
-
 
   let include = [];
 
@@ -98,11 +97,11 @@ exports.findAllAccommodations = async (req, res, next) => {
     return res
       .status(400)
       .json({ message: "Page number must be 0 or a positive integer" });
-  page = parseInt(page); 
+  page = parseInt(page);
 
   if (size && !req.query.size.match(/^([1-9]\d*)$/g))
     return res.status(400).json({ message: "Size must be a positive integer" });
-  size = parseInt(size); 
+  size = parseInt(size);
 
   const limit = size ? size : 5; // limit = size (default is 5)
   const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
@@ -127,7 +126,7 @@ exports.findAllAccommodations = async (req, res, next) => {
       offset,
       raw: true,
     });
-    
+
     const formatDate = (isoDate) => {
       if (!isoDate) return null;
       return new Date(isoDate).toISOString().split("T")[0];
@@ -146,13 +145,6 @@ exports.findAllAccommodations = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: formattedData,
-      links: [
-        {
-          rel: "self",
-          href: `/accommodations`,
-          method: "GET",
-        },
-      ],
     });
   } catch (err) {
     next(err);
@@ -164,8 +156,7 @@ exports.findOneAccommodation = async (req, res, next) => {
     clear();
     const accommodationId = req.params.idAccommodation;
 
-    const accommodation = await Accommodation.findByPk(accommodationId, {
-    });
+    const accommodation = await Accommodation.findByPk(accommodationId, {});
 
     if (!accommodation) {
       throw new ErrorHandler(
@@ -204,8 +195,102 @@ exports.findAllMyAccommodations = async (req, res, next) => {
     clear();
     const userId = req.loggedUserId;
 
+    let {
+      title,
+      location,
+      room_type,
+      bedCount,
+      price_per_night,
+      start_date,
+      end_date,
+      page,
+      size,
+    } = req.query;
+
+    const condition = {
+      createdByUserId: userId,
+      ...(title ? { title: { [Op.like]: `%${title}%` } } : {}),
+      ...(location ? { location: { [Op.like]: `%${location}%` } } : {}),
+      ...(room_type ? { room_type: { [Op.like]: `%${room_type}%` } } : {}),
+      ...(bedCount ? { bed_count: bedCount } : {}),
+      ...(price_per_night ? { price_per_night: price_per_night } : {}),
+    };
+
+
+    if (start_date && end_date) {
+      const startDate = new Date(start_date);
+      const endDate = new Date(end_date);
+
+      condition.available_from = { [Op.lte]: startDate };
+      condition.available_to = { [Op.gte]: endDate };
+
+      const overlappingBookings = await accommodationBooking.findAll({
+        attributes: ["accommodationId"],
+        where: {
+          [Op.or]: [
+            {
+              from: {
+                [Op.between]: [startDate, endDate],
+              },
+            },
+            {
+              to: {
+                [Op.between]: [startDate, endDate],
+              },
+            },
+            {
+              from: {
+                [Op.lte]: startDate,
+              },
+              to: {
+                [Op.gte]: endDate,
+              },
+            },
+          ],
+        },
+        raw: true,
+      });
+
+      const busyIds = overlappingBookings.map((a) => a.accommodationId);
+
+      if (busyIds.length > 0) {
+        condition.id = {
+          [Op.notIn]: busyIds,
+        };
+      }
+    }
+
+    if (page && !req.query.page.match(/^(0|[1-9]\d*)$/g))
+      return res
+        .status(400)
+        .json({ message: "Page number must be 0 or a positive integer" });
+    page = parseInt(page);
+
+    if (size && !req.query.size.match(/^([1-9]\d*)$/g))
+      return res
+        .status(400)
+        .json({ message: "Size must be a positive integer" });
+    size = parseInt(size);
+
+    const limit = size ? size : 5; // limit = size (default is 5)
+    const offset = page ? page * limit : 0; // offset = page * size (start counting from page 0)
+
     let Accommodations = await Accommodation.findAndCountAll({
-      where: { createdByUserId: userId },
+      where: condition,
+      attributes: {
+        include: [
+          [
+            Sequelize.literal(`( 
+              SELECT AVG("rating")
+              FROM "AccommodationRatings"
+              WHERE "AccommodationRatings"."accommodationId" = "Accommodations"."id"
+            )`),
+            "rating",
+          ],
+        ],
+      },
+      limit,
+      offset,
       raw: true,
     });
 
@@ -227,13 +312,6 @@ exports.findAllMyAccommodations = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: formattedData,
-      links: [
-        {
-          rel: "self",
-          href: `/accommodations/myAccommodations`,
-          method: "GET",
-        },
-      ],
     });
   } catch (err) {
     next(err);
@@ -274,7 +352,7 @@ exports.createOneMyAccommodation = async (req, res, next) => {
       ],
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
@@ -302,12 +380,15 @@ exports.updateOneMyAccommodation = async (req, res, next) => {
     }
 
     accommodation.title = req.body.title || accommodation.title;
-    accommodation.description = req.body.description || accommodation.description;
+    accommodation.description =
+      req.body.description || accommodation.description;
     accommodation.location = req.body.location || accommodation.location;
     accommodation.room_type = req.body.room_type || accommodation.room_type;
     accommodation.bed_count = req.body.bed_count || accommodation.bed_count;
-    accommodation.price_per_night = req.body.price_per_night || accommodation.price_per_night;
-    accommodation.available_from = req.body.startDate || accommodation.available_from;
+    accommodation.price_per_night =
+      req.body.price_per_night || accommodation.price_per_night;
+    accommodation.available_from =
+      req.body.startDate || accommodation.available_from;
     accommodation.available_to = req.body.endDate || accommodation.available_to;
 
     await accommodation.save();
@@ -359,23 +440,22 @@ exports.deleteOneMyAccommodation = async (req, res, next) => {
 /*                          accommodationRating                        */
 /*---------------------------------------------------------------------*/
 
-exports.findAllAccommodationRatings = async (req, res, next) => { 
+exports.findAllAccommodationRatings = async (req, res, next) => {
   try {
     clear();
     const userId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation;
-    let AccommodationRatings = {}
+    let AccommodationRatings = {};
 
     if (accommodationId) {
       AccommodationRatings = await AccommodationRating.findAndCountAll({
         where: {
           userId: userId,
-          accommodationId: accommodationId
+          accommodationId: accommodationId,
         },
         raw: true,
       });
-    } 
-    else {
+    } else {
       AccommodationRatings = await AccommodationRating.findAndCountAll({
         where: {
           userId: userId,
@@ -385,7 +465,10 @@ exports.findAllAccommodationRatings = async (req, res, next) => {
     }
 
     if (!AccommodationRatings || AccommodationRatings.length === 0) {
-      throw new ErrorHandler(404, "No accommodationRating found for this user.");
+      throw new ErrorHandler(
+        404,
+        "No accommodationRating found for this user."
+      );
     }
 
     return res.status(200).json({
@@ -403,7 +486,9 @@ exports.findOneAccommodationRating = async (req, res, next) => {
 
     const loggedUserId = req.loggedUserId;
     const accommodationRatingId = req.params.idAccommodationRating;
-    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+    const accommodationRating = await AccommodationRating.findByPk(
+      accommodationRatingId
+    );
 
     if (!accommodationRating) {
       throw new ErrorHandler(
@@ -434,20 +519,24 @@ exports.createOneAccommodationRating = async (req, res, next) => {
 
     const loggedUserId = req.loggedUserId;
     const accommodationId = req.params.idAccommodation;
-    const accommodationRating = await AccommodationRating.findByPk(accommodationId);
+    const accommodationRating = await AccommodationRating.findOne({
+      where: {
+        userId: loggedUserId,
+        accommodationId: accommodationId,
+      },
+    });
 
     if (accommodationRating) {
-      throw new ErrorHandler(
-        400,
-        "You have already rated this accommodation."
-      );
+      throw new ErrorHandler(400, "You have already rated this accommodation.");
     }
 
+    console.log(req.body);
+    
     let newAccommodationRating = await AccommodationRating.create({
       userId: loggedUserId,
       accommodationId: accommodationId,
       rating: req.body.rating,
-      commentary:req.body.coommentary
+      commentary: req.body.commentary,
     });
 
     return res.status(200).json({
@@ -455,7 +544,7 @@ exports.createOneAccommodationRating = async (req, res, next) => {
       data: newAccommodationRating,
     });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
@@ -465,7 +554,9 @@ exports.updateOneAccommodationRating = async (req, res, next) => {
 
     const loggedUserId = req.loggedUserId;
     const accommodationRatingId = req.params.idAccommodationRating;
-    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+    const accommodationRating = await AccommodationRating.findByPk(
+      accommodationRatingId
+    );
 
     if (!accommodationRating) {
       throw new ErrorHandler(
@@ -482,7 +573,8 @@ exports.updateOneAccommodationRating = async (req, res, next) => {
     }
 
     accommodationRating.rating = req.body.rating || accommodationRating.rating;
-    accommodationRating.commentary = req.body.commentary || accommodationRating.commentary
+    accommodationRating.commentary =
+      req.body.commentary || accommodationRating.commentary;
 
     await accommodationRating.save();
 
@@ -500,9 +592,11 @@ exports.deleteOneAccommodationRating = async (req, res, next) => {
     clear();
 
     const loggedUserId = req.loggedUserId;
-    const accommodationRatingId = req.params.idAccommodation;
+    const accommodationRatingId = req.params.idAccommodationRating;
 
-    const accommodationRating = await AccommodationRating.findByPk(accommodationRatingId);
+    const accommodationRating = await AccommodationRating.findByPk(
+      accommodationRatingId
+    );
 
     if (!accommodationRating) {
       throw new ErrorHandler(

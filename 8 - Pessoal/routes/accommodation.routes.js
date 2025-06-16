@@ -27,10 +27,10 @@ router.route('/myAccommodations/:idAccommodation')
 
 router.route('/myAccommodations/:idAccommodation/bookings')
   .get(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.findAllAccommodationBookings)
-  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
 
 router.route('/myAccommodations/:idAccommodation/bookings/:idAccommodationBooking')
-  .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking);
+  .patch(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.validateAccommodationBooking)
+  .delete(authController.verifyToken, authController.isAdminOrFacilitador, bookingsController.deleteOneMyAccommodationBooking);
     
 router.route('/myAccommodations/:idAccommodation/ratings')
   .get(authController.verifyToken,authController.isAdminOrFacilitador, accommodationsController.findAllAccommodationRatings) 
@@ -50,6 +50,8 @@ router.route('/:idAccommodation/booking')
 router.route('/:idAccommodation/ratings')
   .get(authController.verifyToken, accommodationsController.findAllAccommodationRatings) 
   .post(authController.verifyToken, accommodationsController.createOneAccommodationRating)
+
+router.route('/:idAccommodation/ratings/:idAccommodationRating')
   .patch(authController.verifyToken, accommodationsController.updateOneAccommodationRating)
   .delete(authController.verifyToken, accommodationsController.deleteOneAccommodationRating);
 

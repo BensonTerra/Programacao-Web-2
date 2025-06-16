@@ -56,16 +56,16 @@ exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
   try {
     clear();
 
-    const accommodationId = req.params.idAccommodation;
+    const accommodationBookingId = req.params.idAccommodationBooking;
 
-    const accommodationBooking = await EventBooking.findByPk(accommodationId);
+    const accommodationBooking = await AccommodationBooking.findByPk(accommodationBookingId);
 
     const loggedUserId = req.loggedUserId;
 
     if (!accommodationBooking) {
       throw new ErrorHandler(
         404,
-        `Cannot find any eventBooking with ID ${accommodationId}.`
+        `Cannot find any AccommodationBooking with ID ${accommodationBookingId}.`
       );
     }
 
@@ -80,7 +80,7 @@ exports.deleteOneMyAccommodationBooking = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      data: `AccommoadationBooking with ID ${accommodationId} deleted successfully.`,
+      data: `AccommoadationBooking with ID ${accommodationBookingId} deleted successfully.`,
     });
   } catch (err) {
     next(err);
@@ -162,23 +162,18 @@ exports.createOneBooking = async (req, res) => {
     const accommodationId = req.params.idAccommodation;
     const eventId = req.params.idEvent;
 
+    const accommodation = await Accommodation.findByPk(accommodationId);
+    const event = await Event.findByPk(eventId);
+    
     const { from, to, numPeople } = req.body;
 
-    // Se for reserva de alojamento, validar campos obrigatórios
-    if (accommodationId && accommodationId != 0) {
-      if (accommodationId) {
+    if (accommodation) {
+      if (accommodation && accommodationId) {
         if (!from || !to || !numPeople) {
           return res.status(400).json({
             errorMessage:
               "Campos obrigatórios em falta para reserva de alojamento: DataInicio, DataFim, NumPessoas.",
           });
-        }
-
-        const accommodation = await Accommodation.findByPk(accommodationId);
-        if (!accommodation) {
-          return res
-            .status(404)
-            .json({ errorMessage: "Alojamento não encontrado." });
         }
 
         const existingBooking = await AccommodationBooking.findOne({
@@ -196,28 +191,27 @@ exports.createOneBooking = async (req, res) => {
               "Já existe uma reserva pendente para este usuário neste alojamento.",
           });
         }
+        
+        novaReserva = await AccommodationBooking.create({
+          userId,
+          accommodationId,
+          from: from,
+          to: to,
+          numPeople: numPeople,
+          status: "pendente",
+          commentary: null,
+        });
       }
-
-      novaReserva = await AccommodationBooking.create({
-        userId,
-        accommodationId,
-        from: from,
-        to: to,
-        numPeople: numPeople,
-        status: "pendente",
-        commentary: null,
-      });
+      else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Alojamento não encontrado." });
+      }
     }
 
-    if (eventId && eventId != 0) {
-      if (eventId) {
-        const evento = await Event.findByPk(eventId);
-        if (!evento) {
-          return res
-            .status(404)
-            .json({ errorMessage: "Evento não encontrado." });
-        }
 
+    if (event) {
+      if (event && !accommodationId) {
         const existingBooking = await EventBooking.findOne({
           where: {
             userId,
@@ -230,15 +224,21 @@ exports.createOneBooking = async (req, res) => {
           return res.status(409).json({
             success: false,
             message:
-              "Já existe uma inscrição pendente para este usuário neste evento.",
+              "Já possui uma inscrição para este evento.",
           });
         }
+      
+        novaReserva = await EventBooking.create({
+          userId,
+          eventId,
+          estado: "inscrito",
+        });
       }
-      novaReserva = await EventBooking.create({
-        userId,
-        eventId,
-        estado: "inscrito",
-      });
+      else {
+        return res
+          .status(404)
+          .json({ errorMessage: "Evento não encontrado." });
+      }
     }
 
     return res.status(201).json({

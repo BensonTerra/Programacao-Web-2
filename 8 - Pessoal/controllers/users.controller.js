@@ -202,14 +202,14 @@ exports.deleteOneUser = async (req, res, next) => {
 
     const userId = req.params.idUser;
 
-    if (req.loggedUserId = userId) {
+    if (req.loggedUserId == userId) {
       return res.status(403).json({
         success: false,
         message: 'You cannot delete your own user account.',
       });
     }
 
-    const user = await User.findByPk(userId)
+    const user = await User.findByPk(userId); console.log(user)
 
     if (!user) {
       throw new ErrorHandler(404, `Cannot find any user with ID ${userId}.`);

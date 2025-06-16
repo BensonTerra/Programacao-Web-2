@@ -30,11 +30,11 @@ module.exports = function (sequelize, DataTypes) {
       },
       location: {
         type: DataTypes.STRING(100),
-        allowNull: true,
+        allowNull: false,
       },
       room_type: {
         type: DataTypes.STRING(100),
-        allowNull: true,
+        allowNull: false,
       },
       bed_count: {
         type: DataTypes.INTEGER,
@@ -49,7 +49,7 @@ module.exports = function (sequelize, DataTypes) {
       },
       price_per_night: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: true,
+        allowNull: false,
         validate: {
           isDecimal: { msg: "Price per night must be a decimal number." },
           min: {
