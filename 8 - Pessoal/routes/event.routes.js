@@ -50,9 +50,6 @@ router.route('/:idEvent/booking')
     .delete(authController.verifyToken, authController.isAdminFacilitador, eventsController.delete);
 */
 
-router.route('/')
-    .get(eventsController.findAllEvents)
-
 router.all('*', function (req, res) {
     res.status(400).json({ success: false, message:`The API does not recognize the request on ${req.method} ${req.url}` });
 })

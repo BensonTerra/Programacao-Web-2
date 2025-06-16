@@ -65,7 +65,7 @@ db.accommodationRating.belongsTo(db.accommodation, { foreignKey: 'accommodationI
 (async () => {
     try {;
         //await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+        await sequelize.sync({ alter: true });
         //await sequelize.sync();
 
         clear()

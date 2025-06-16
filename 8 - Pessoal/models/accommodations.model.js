@@ -26,7 +26,6 @@ module.exports = function (sequelize, DataTypes) {
       },
       description: {
         type: DataTypes.TEXT,
-        allowNull: true,
       },
       location: {
         type: DataTypes.STRING(100),

@@ -404,11 +404,6 @@ exports.findAllMyEventBookings = async (req, res, next) => {
           attributes: ['id', 'title', 'available_from'],
         },
       ],
-      order: [
-        [
-          { model: Event, as: 'event' }, 'available_from', 'DESC'
-        ]
-      ],
     });
 
     return res.status(200).json({

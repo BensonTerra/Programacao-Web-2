@@ -26,11 +26,11 @@ module.exports = function (sequelize, DataTypes) {
       },
       description: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: false,
       },
       location: {
         type: DataTypes.STRING(100),
-        allowNull: true,
+        allowNull: false,
       },
       price: {
         type: DataTypes.DECIMAL(10, 2),
