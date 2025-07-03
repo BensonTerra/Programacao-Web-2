@@ -58,8 +58,8 @@ db.Tag = require('./tags.model.js')(sequelize, Sequelize.DataTypes);
 db.User.hasMany(db.Post, { foreignKey: 'author', onDelete: 'CASCADE', allowNull: false });
 db.Post.belongsTo(db.User, { foreignKey: 'author', as: 'creator', onDelete: 'CASCADE', allowNull: false });
 
-db.Post.belongsToMany(db.Tag, { through: 'PostTags', timestamps: false });
-db.Tag.belongsToMany(db.Post, { through: 'PostTags', timestamps: false });
+db.Post.belongsToMany(db.Tag, { through: 'PostTags', foreignKey: 'PostId', otherKey: 'TagId', timestamps: false });
+db.Tag.belongsToMany(db.Post, { through: 'PostTags', foreignKey: 'TagId', otherKey: 'PostId', timestamps: false });
 
 // Execução principal
 (async () => {
@@ -69,11 +69,11 @@ db.Tag.belongsToMany(db.Post, { through: 'PostTags', timestamps: false });
         await sequelize.authenticate();
         console.log("✅ Connected to the database MySQL!");
 
-        //await sequelize.sync({ force: true });
+        await sequelize.sync({ force: true });
         //await sequelize.sync({ alter: true });
         //await sequelize.sync();
         
-        //console.log("✅ DB is successfully synchronized");
+        console.log("✅ DB is successfully synchronized");
     } catch (error) {
         console.error('❌ Erro geral:', error);
         process.exit(1);
