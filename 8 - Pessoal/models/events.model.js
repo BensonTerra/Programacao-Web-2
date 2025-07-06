@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
-        references: {
+        references: { //relation
           model: "Users",
           key: "id",
         },

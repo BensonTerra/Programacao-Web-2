@@ -69,8 +69,8 @@ db.Tag.belongsToMany(db.Post, { through: 'PostTags', foreignKey: 'TagId', otherK
         await sequelize.authenticate();
         console.log("✅ Connected to the database MySQL!");
 
-        await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+        //await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
         //await sequelize.sync();
         
         console.log("✅ DB is successfully synchronized");
