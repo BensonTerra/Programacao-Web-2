@@ -30,7 +30,7 @@ CREATE TABLE PostTags (
 
 INSERT INTO Users (username, password, role) VALUES
 ('bruno_admin', 'adminpass', 'admin'),
-('carla_writer', 'passw0rd', 'editor'),
+('carla_writer', 'password', 'editor'),
 ('ana_dev', '123456', 'editor');
 
 
