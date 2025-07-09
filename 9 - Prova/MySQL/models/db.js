@@ -26,6 +26,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.sequelize = sequelize;
 
+db.User = require("./users.model.js")(sequelize, DataTypes);
 
 (async () => {
     try {;

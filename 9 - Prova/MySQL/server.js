@@ -30,5 +30,5 @@ app.use((err, req, res, next) => {
     });
   });
 
-clear()
+
 app.listen(port, host, () => console.log(`App listening at http://${host}:${port}/`));
