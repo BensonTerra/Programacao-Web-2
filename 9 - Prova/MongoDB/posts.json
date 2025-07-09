@@ -1,1 +1,0 @@
-{"_id":{"$oid":"681df04edad8207033512485"},"title":"JSON Web Token","description":"Learn how to implement JSON Web Token (JWT) authentication in your Node.js and Express applications.","published":false,"views":{"$numberInt":"10"},"author":{"$oid":"681deecd60b9be11bd1fe3eb"},"publishedAt":{"$date":{"$numberLong":"1746792526052"}},"__v":{"$numberInt":"0"}}

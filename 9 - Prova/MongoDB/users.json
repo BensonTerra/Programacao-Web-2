@@ -1,2 +1,0 @@
-[{"_id":{"$oid":"681dee9960b9be11bd1fe3ea"},"username":"bruno_admin","password":"adminpass","role":"admin"},
-{"_id":{"$oid":"681deecd60b9be11bd1fe3eb"},"username":"carla_writer","password":"passw0rd","role":"editor"}]
