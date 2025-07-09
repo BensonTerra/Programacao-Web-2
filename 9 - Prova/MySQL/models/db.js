@@ -30,8 +30,8 @@ db.User = require("./users.model.js")(sequelize, DataTypes);
 
 (async () => {
     try {;
-        await sequelize.sync({ force: true });
-        //await sequelize.sync({ alter: true });
+        //await sequelize.sync({ force: true });
+        await sequelize.sync({ alter: true });
         //await sequelize.sync();
 
         clear()
