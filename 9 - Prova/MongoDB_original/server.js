@@ -1,3 +1,4 @@
+const clear = require('clear');
 const express = require('express');
 
 // read environment variables from .env file
@@ -12,19 +13,21 @@ app.use(express.json());
 
 // middleware for ALL routes
 app.use((req, res, next) => {
+    clear()
     const start = Date.now();
     res.on("finish", () => { // finish event is emitted once the response is sent to the client
         const diffSeconds = (Date.now() - start) / 1000; // figure out how many seconds elapsed
-        console.log(`Request: ${req.method} ${req.originalUrl} completed in ${diffSeconds} seconds`);
+        //console.log(`Request: ${req.method} ${req.originalUrl} completed in ${diffSeconds} seconds`);
     });
     next()
 })
 
-// use route middleware for /users requests
-app.use('/users', require('./routes/users.routes.js'));
+
+// use route middleware for /posts requests
+app.use('/posts', require('./routes/posts.routes.js'));
 
 // use route middleware for /users requests
-app.use('/posts', require('./routes/posts.routes.js'));
+app.use('/users', require('./routes/users.routes.js'));
 
 //handle invalid routes (404)    
 app.use((req, res, next) => {

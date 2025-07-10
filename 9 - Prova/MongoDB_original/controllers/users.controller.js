@@ -1,44 +1,4 @@
 const db = require('../models/db.js'); // Import the database connection
-const User = db.User
-
-exports.getAllUsers = async (req, res, next) => {
-    try {
-        const filter = {};
-
-        // Função para escapar caracteres especiais para regex
-        const escapeRegex = (text) => {
-            return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-        };
-
-        // Filtrar por username com regex (busca parcial, case-insensitive)
-        if (req.query.username) {
-            const usernameRegex = new RegExp(escapeRegex(req.query.username), 'i');
-            filter.username = usernameRegex;
-        }
-
-        // Filtrar por role também com regex (busca parcial, case-insensitive)
-        if (req.query.role) {
-            const roleRegex = new RegExp(escapeRegex(req.query.role), 'i');
-            filter.role = roleRegex;
-        }
-
-        console.log(filter)
-        const users = await User.find(filter)
-            .select('-password -__v')
-            .exec();
-
-        return res.status(200).json(users);
-    }
-    catch (err) {
-        next(err);
-    }
-}
-
-
-
-
-
-
 
 // get all posts from a user 
 let getPostsFromUser = async (req, res, next) => {
@@ -78,4 +38,10 @@ let getPostsFromUser = async (req, res, next) => {
     catch (err) {
         next(err);
     }
+}
+
+
+
+module.exports = {
+    getPostsFromUser
 }

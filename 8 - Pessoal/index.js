@@ -13,6 +13,7 @@ app.get('/', function (req, res) {
     res.status(200).json({ message: 'REST Api - Pessoal' });
 });
 
+//Global middleware usa app.use('/rota', require())
 app.use('/users',  require('./routes/users.routes.js'))
 app.use('/accommodations', require('./routes/accommodation.routes.js'));
 app.use('/events', require('./routes/event.routes.js'));
