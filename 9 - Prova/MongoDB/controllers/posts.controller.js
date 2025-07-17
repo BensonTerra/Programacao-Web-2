@@ -100,7 +100,7 @@ let getAllPosts = async (req, res, next) => {
     }
 }
 
-let getPostById = async (req, res, next) => {
+let getOnePost = async (req, res, next) => {
     try {
         const post = await Post.findById(req.params.id)
             .select('-__v') // exclude the __v field from the result
@@ -212,6 +212,6 @@ let deletePost = async (req, res, next) => {
 
 
 module.exports = {
-    getAllPosts, getPostById,
+    getAllPosts, getOnePost,
     addPost, updatePost, deletePost
 }

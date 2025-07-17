@@ -34,8 +34,11 @@ exports.getAllUsers = async (req, res, next) => {
     }
 }
 
+exports.getOneUser = async (req, res, next) => {}
 
+// updateOneUser
 
+// deleteOneUser
 
 
 

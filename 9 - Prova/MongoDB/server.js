@@ -4,16 +4,14 @@ const express = require('express');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT;	// use environment variables
 const host = process.env.HOST;
-
-
+const port = process.env.PORT;	// use environment variables
 app.use(express.json());
 
 // middleware for ALL routes
 app.use((req, res, next) => {
     const start = Date.now();
-    res.on("finish", () => { // finish event is emitted once the response is sent to the client
+    res.on("finish", () => {// finish event is emitted once the response is sent to the client
         const diffSeconds = (Date.now() - start) / 1000; // figure out how many seconds elapsed
         console.log(`Request: ${req.method} ${req.originalUrl} completed in ${diffSeconds} seconds`);
     });

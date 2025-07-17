@@ -5,7 +5,7 @@ const router = express.Router();
 const postsController = require('../controllers/posts.controller.js');
 
 router.get('/', postsController.getAllPosts);
-router.get('/:id', postsController.getPostById);
+router.get('/:id', postsController.getOnePost);
 
 router.post('/',  postsController.addPost);
 router.put('/:id', postsController.updatePost);
