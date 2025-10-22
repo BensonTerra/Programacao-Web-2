@@ -59,10 +59,10 @@ router.route('/:idAccommodation/ratings/:idAccommodationRating')
 /*                                         TRATAMENTO DE ROTA INVÁLIDA                                          */
 /*--------------------------------------------------------------------------------------------------------------*/
 
-router.all('*', (req, res) => {
+router.all(/.*/, (req, res) => {
   res.status(400).json({
     success: false,
-    message: `The API does not recognize the request on ${req.method} ${req.url}`,
+    message: `The API does not recognize the request on ${req.method} ${req.url}`
   });
 });
 

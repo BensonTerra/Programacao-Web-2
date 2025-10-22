@@ -57,11 +57,12 @@ router.route('/login')
 /*                                          ROTA PARA ERROS GENÉRICOS                                           */
 /*--------------------------------------------------------------------------------------------------------------*/
 
-router.all('*', (req, res) => {
+router.all(/.*/, (req, res) => {
   res.status(400).json({
     success: false,
     message: `The API does not recognize the request on ${req.method} ${req.url}`
   });
 });
+
 
 module.exports = router;

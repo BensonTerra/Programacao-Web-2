@@ -18,7 +18,7 @@ app.use('/users',  require('./routes/users.routes.js'))
 app.use('/accommodations', require('./routes/accommodation.routes.js'));
 app.use('/events', require('./routes/event.routes.js'));
 
-app.all('*', function (req, res) {
+app.all(/.*/, function (req, res) {
 	res.status(400).json({ error: `The API does not recognize the request on ${req.url}` });
 })
 
