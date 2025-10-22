@@ -1,0 +1,112 @@
+[
+  {
+    "_id": { "$oid": "64bfc0100000000000000001" },
+    "title": "Chatbot Académico",
+    "author": { "$oid": "64bfc0010000000000000004" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-28T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "pending",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000002" },
+    "title": "App de Tarefas",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000003" },
+    "deadline": { "$date": "2025-07-25T23:59:00Z" },
+    "maxAttempts": 2,
+    "status": "pending",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000003" },
+    "title": "App de Clima",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-23T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "pending",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000004" },
+    "title": "Sistema de Reservas",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-23T23:59:00Z" },
+    "maxAttempts": 2,
+    "status": "approved",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000005" },
+    "title": "Plataforma de Estágios",
+    "author": { "$oid": "64bfc0010000000000000004" },
+    "supervisor": { "$oid": "64bfc0010000000000000003" },
+    "deadline": { "$date": "2025-07-25T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "approved",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000006" },
+    "title": "Gestor de Finanças",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000003" },
+    "deadline": { "$date": "2025-07-22T23:59:00Z" },
+    "maxAttempts": 2,
+    "status": "approved",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000007" },
+    "title": "Jogo Web",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-01T23:59:00Z" },
+    "maxAttempts": 2,
+    "status": "submitted",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000008" },
+    "title": "Quiz Interativo",
+    "author": { "$oid": "64bfc0010000000000000004" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-15T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "submitted",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000009" },
+    "title": "Sistema de Votação",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-07-23T23:59:00Z" },
+    "maxAttempts": 2,
+    "status": "submitted",
+    "grade": null
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000010" },
+    "title": "Portal de Notícias",
+    "author": { "$oid": "64bfc0010000000000000001" },
+    "supervisor": { "$oid": "64bfc0010000000000000002" },
+    "deadline": { "$date": "2025-06-20T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "graded",
+    "grade": 18
+  },
+  {
+    "_id": { "$oid": "64bfc0100000000000000011" },
+    "title": "Plataforma Educativa",
+    "author": { "$oid": "64bfc0010000000000000004" },
+    "supervisor": { "$oid": "64bfc0010000000000000003" },
+    "deadline": { "$date": "2025-07-21T23:59:00Z" },
+    "maxAttempts": 3,
+    "status": "expired",
+    "grade": null
+  }
+]

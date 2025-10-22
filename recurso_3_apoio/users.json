@@ -1,0 +1,30 @@
+[
+  {
+    "_id": { "$oid": "64bfc0010000000000000001" },
+    "email": "ana.aluno@example.com",
+    "name": "Ana Aluno",
+    "password": "1234",
+    "role": "student"
+  },
+  {
+    "_id": { "$oid": "64bfc0010000000000000002" },
+    "email": "bruno.prof@example.com",
+    "name": "Bruno Professor",
+    "password": "1234",
+    "role": "teacher"
+  },
+  {
+    "_id": { "$oid": "64bfc0010000000000000003" },
+    "email": "carlos.prof@example.com",
+    "name": "Carlos Professor",
+    "password": "1234",
+    "role": "teacher"
+  },
+  {
+    "_id": { "$oid": "64bfc0010000000000000004" },
+    "email": "daniel.aluno@example.com",
+    "name": "Daniel Aluno",
+    "password": "1234",
+    "role": "student"
+  }
+]
