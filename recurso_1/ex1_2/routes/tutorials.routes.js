@@ -22,7 +22,7 @@ router.route('/:idT/tags/:idTag')
     .delete(tutorialController.deleteTag); // DELETE /tutorials/:idT/tags/:idTag
 
 
-router.all('*', function (req, res) {
+router.all(/.*/, function (req, res) {
     //send an predefined error message 
     res.status(400).json({ success: false, message:`The API does not recognize the request on ${req.method} ${req.url}` });
 })

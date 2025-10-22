@@ -18,7 +18,7 @@ router.route('/:userID')
     .get(authController.verifyToken, authController.isAdminOrLoggedUser, userController.getUser); //ADMIN or LOGGED USER ONLY
 
 
-router.all('*', function (req, res) {
+router.all(/.*/, function (req, res) {
     //send an predefined error message 
     res.status(400).json({ success: false, message: `The API does not recognize the request on ${req.method} ${req.url}` });
 })
