@@ -20,7 +20,7 @@ app.use('/tags', require('./routes/tags.routes.js'))
 app.use('/users', require('./routes/users.routes.js'))
 
 // handle invalid routes
-app.all('*', function (req, res) {
+app.all(/.*/, function (req, res) {
 	res.status(400).json({ error: `The API does not recognize the request on ${req.url}` });
 })
 

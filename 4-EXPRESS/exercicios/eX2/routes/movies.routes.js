@@ -18,7 +18,7 @@ router.route('/:id')
 .put(moviesController.bodyValidator, moviesController.update)
 .delete(moviesController.delete);
 
-router.all('*', (req, res) => {
+router.all(/.*/), (req, res) => {
 res.status(404).json({ message: 'MOVIES: what???' }); //send a predefined error message
 })
 //export this router

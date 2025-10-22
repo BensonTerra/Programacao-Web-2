@@ -1,7 +1,6 @@
 const { dbConfig } = require('../utils/config.js');
 const { Sequelize, DataTypes } = require('sequelize');
-const clear = require('clear');
-const req = require('express/lib/request.js');
+const clear = require('clear')
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
@@ -18,7 +17,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 (async () => {
     try {
         await sequelize.authenticate();
-        console.log('Connection to DB has been established successfully.');
+        console.log('Connection do DB has been established successfully.');
     } catch (err) {
         console.error('Unable to connect to the database:', err);
     }
@@ -61,17 +60,17 @@ db.accommodationRating.belongsTo(db.user, { foreignKey: 'userId', as: 'user' });
 db.accommodation.hasMany(db.accommodationRating, { foreignKey: 'accommodationId', as: 'ratings', onDelete: 'CASCADE', hooks: true });
 db.accommodationRating.belongsTo(db.accommodation, { foreignKey: 'accommodationId', as: 'accommodation' });
 
-
+// optionally: SYNC
 (async () => {
-    try {;
-        //await sequelize.sync({ force: true });
+    try {
+        // await sequelize.sync({ force: true });
         //await sequelize.sync({ alter: true });
         //await sequelize.sync();
 
         clear()
-        console.log('DB is successfully synchronized');
+        console.log('DB is successfully synchronized')
     } catch (error) {
-        console.error('Error synchronizing the DB:', error);
+        console.log(error)
     }
 })();
 

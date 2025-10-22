@@ -4,8 +4,8 @@ const clear = require('clear')
 
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
-    dialect: dbConfig.dialect
-    ,
+    port: dbConfig.PORT,
+    dialect: dbConfig.dialect,
     pool: {
         max: dbConfig.pool.max,
         min: dbConfig.pool.min,
@@ -61,8 +61,9 @@ db.user.hasMany(db.comment, {foreignKey: "author"});
 (async () => {
     try {
         // await sequelize.sync({ force: true });
-        await sequelize.sync({ alter: true });
-        // await sequelize.sync();
+        //await sequelize.sync({ alter: true });
+        //await sequelize.sync();
+
         clear()
         console.log('DB is successfully synchronized')
     } catch (error) {

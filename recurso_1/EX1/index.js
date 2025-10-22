@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
 app.use('/books', require('./routes/books.routes.js'))
 
 // handle invalid routes
-app.all('*', function (req, res) {
+app.all(/.*/), function (req, res) {
 	res.status(400).json({ error: `The API does not recognize the request on ${req.url}` });
 })
 

@@ -20,7 +20,7 @@ router.route('/purchases/:idP')
 .get(teste1Controller.findOneProduct)
 
 
-router.all('*', (req, res) => {
+router.all(/.*/), (req, res) => {
 res.status(404).json({ message: 'Erro de rota' }); //send a predefined error message
 })
 //export this router

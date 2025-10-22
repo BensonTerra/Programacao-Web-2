@@ -30,7 +30,7 @@ app.use('/tutorials', require('./routes/tutorials.routes.js'))
 //--//--//
 
 // handle invalid routes
-app.all('*', function (req, res) {
+app.all(/.*/), function (req, res) {
     res.status(404).json({ message: 'WHAT???' });
 })
 

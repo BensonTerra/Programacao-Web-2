@@ -11,7 +11,7 @@ router.route('/')
 router.route('/:idC')
     .delete( commentController.delete); // DELETE /tutorials/:idT/comments/:idC
 
-router.all('*', function (req, res) {
+router.all(/.*/, function (req, res) {
     //send an predefined error message 
     res.status(404).json({ message: 'COMMENTS: what???' });
 })

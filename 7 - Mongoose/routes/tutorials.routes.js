@@ -30,7 +30,7 @@ router.route('/:idT')
 // you can nest routers by attaching them as middleware​
 router.use('/:idT/comments', commentsRouter); // ??? /tutoriasl/:idT/comments
 
-router.all('*', function (req, res) {
+router.all(/.*/, function (req, res) {
     //send an predefined error message 
     res.status(404).json({ message: 'TUTORIALS: what???' });
 })

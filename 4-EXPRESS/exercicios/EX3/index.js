@@ -27,7 +27,7 @@ app.get('/', function (req, res) {
 app.use('/teste1', require('./routes/teste1.routes.js'));
 
 // Tratamento de rotas inválidas
-app.all('*', function (req, res) {
+app.all(/.*/), function (req, res) {
   res.status(404).json({ message: 'WHAT???' });
 });
 

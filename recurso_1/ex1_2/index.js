@@ -28,7 +28,7 @@ app.use('/genres', require('./routes/recursoRoutes/genres.routes.js'))
 app.use('/instances', require('./routes/recursoRoutes/instances.route.js'))
 
 // handle invalid routes
-app.all('*', function (req, res) {
+app.all(/.*/), function (req, res) {
 	res.status(400).json({ error: `The API does not recognize the request on ${req.url}` });
 })
 

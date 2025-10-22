@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
 app.use('/tutorials', require('./routes/tutorials.routes.js'))
 
 // handle invalid routes
-app.all('*', function (req, res) {
+app.all(/.*/), function (req, res) {
 	res.status(400).json({ success: false, msg: `The API does not recognize the request on ${req.url}` });
 })
 app.listen(port, host, () => console.log(`App listening at http://${host}:${port}/`));
